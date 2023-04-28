@@ -1,29 +1,46 @@
-import React, { useState } from 'react'
-import { Register } from './Register';
-import { SignIn } from './SignIn';
+import React, { useState } from "react";
+import { Register } from "./Register";
+import { SignIn } from "./SignIn";
 import "../../css/LandingPage.css";
 
 export const LandingPage = () => {
-  const [regPopup, setRegPopup] = useState(false)
-  const [signInPopup, setSignInPopup] = useState(false)
-  
+  const [regPopup, setRegPopup] = useState(false);
+  const [signInPopup, setSignInPopup] = useState(false);
+  const [showRegisterButton, setShowRegisterButton] = useState(true);
+  const [showExistingUserButton, setShowExistingUserButton] = useState(true);
+
   const regClickHandler = () => {
-    setRegPopup(true)
-  }
+    setShowRegisterButton(false);
+    setShowExistingUserButton(false);
+    setRegPopup(true);
+    console.log(regPopup)
+  };
   const signInClickHandler = () => {
-    setSignInPopup(true)
-  }
+    setShowExistingUserButton(false);
+    setShowRegisterButton(false);
+
+    setSignInPopup(true);
+  };
   return (
-    <div className='landing-page-container'>
-    <div className='landing-page'>
-      <div className='logo'>
-        LOGO
+    <main className="flex-box">
+    <div className="landing-page-container">
+      <div className="landing-page">
+        <div className="logo"></div>
+        {showRegisterButton && (
+          <button className="register-button" onClick={regClickHandler}>
+            Register
+          </button>
+        )}
+
+        {regPopup && <Register />}
+        {showExistingUserButton && (
+          <button className="existing-user-button"  onClick={signInClickHandler}>
+            Existing User
+          </button>
+        )}
+        {signInPopup && <SignIn />}
       </div>
-      <button className='register-button' onClick={regClickHandler}>Register</button>
-      <button className='existing-user-button' onClick={signInClickHandler}>Existing User</button>
-      {regPopup && <Register />}
-      {signInPopup && <SignIn />}
     </div>
-    </div>
-  )
-}
+  </main>
+  );
+};

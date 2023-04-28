@@ -23,4 +23,4 @@ const AuthTest = () => {
 }
 
 
-export default AuthTest
+export default AuthTest;
