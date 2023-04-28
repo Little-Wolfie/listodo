@@ -1,13 +1,18 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import '../../css/TaskDashboard.css'
 
 export const TaskDashboard = () => {
+  const navigate = useNavigate()
+
   return (
     <div className='task-dashboard'>
       <header>
         <div className='header-container'>
           <button>Create Task</button>
-          <button>Profile</button>
+          <button onClick={() => {
+            navigate('/profile')
+          }}>Profile</button>
         </div>
       </header>
       <div className='filtering-container'>
