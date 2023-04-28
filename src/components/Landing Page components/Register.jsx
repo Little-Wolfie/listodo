@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { auth } from "../../firebase/firebase";
+import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
 export const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+  const navigate = useNavigate()
 
   const createAccount = async () => {
     if (
@@ -18,6 +20,7 @@ export const Register = () => {
     }
 
     await createUserWithEmailAndPassword(auth, email, password);
+    navigate("/dashboard")
   };
 
   return (
