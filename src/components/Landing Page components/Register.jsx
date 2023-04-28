@@ -5,9 +5,9 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 export const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(false);
 
-  const CreateAccount = async () => {
+  const createAccount = async () => {
     if (
       !/^[\w-]+(\.[\w-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*(\.[a-zA-Z]{2,})$/g.test(
         email
@@ -17,30 +17,26 @@ export const Register = () => {
       setError(true);
     }
 
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      console.error(error);
-      setError(error);
-    }
-
-    return (
-      <div>
-        <input
-          placeholder="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        ></input>
-        <input
-          placeholder="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        ></input>
-        <button onClick={CreateAccount}>Create Account</button>
-      </div>
-    );
+    await createUserWithEmailAndPassword(auth, email, password);
   };
+
+  return (
+    <div>
+      <input
+        placeholder="email"
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+      ></input>
+      <input
+        placeholder="password"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      ></input>
+      {error && <p>Email or Password invalid</p>}
+      <button onClick={createAccount}>Create Account</button>
+    </div>
+  );
 };

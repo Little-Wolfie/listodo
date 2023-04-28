@@ -13,13 +13,16 @@ export const LandingPage = () => {
     setShowRegisterButton(false);
     setShowExistingUserButton(false);
     setRegPopup(true);
+    console.log(regPopup)
   };
   const signInClickHandler = () => {
     setShowExistingUserButton(false);
     setShowRegisterButton(false);
+
     setSignInPopup(true);
   };
   return (
+    <main className="flex-box">
     <div className="landing-page-container">
       <div className="landing-page">
         <div className="logo"></div>
@@ -38,5 +41,6 @@ export const LandingPage = () => {
         {signInPopup && <SignIn />}
       </div>
     </div>
+  </main>
   );
 };
