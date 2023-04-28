@@ -1,0 +1,23 @@
+.landing-page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    margin-top: 180px;
+    margin-left: 200px;
+    background-color: red;
+    width: 20rem;
+    height: 20rem;
+}
+
+.landing-page-container button {
+    display: block;
+    margin: 2rem;
+
+}
+
+.logo {
+    width: 200px;
+    height: 100px;
+    background-color: blue;
+}
