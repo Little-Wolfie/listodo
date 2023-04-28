@@ -1,0 +1,36 @@
+.header-container {
+    width: 100vw;
+    height: fit-content;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: blue;
+}
+
+.header-container button {
+    margin: 3rem 5rem 2rem 5rem;
+    border-radius: 1rem;
+}
+
+.list-container {
+    height: 25rem;
+    width: 15rem;
+    overflow: scroll;
+    background-color: red;
+    margin: 0rem auto
+}
+
+.list-container ol {
+    list-style: none;
+}
+
+.filtering-container {
+    margin: 1rem auto
+}
+
+.map-wrapper {
+    background-color: purple;
+    height: 25rem;
+    width: 15rem;
+    margin: 0rem auto
+}
