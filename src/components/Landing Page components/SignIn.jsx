@@ -1,18 +1,21 @@
 import { useState } from "react";
 import { auth } from "../../firebase/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 export const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const navigate = useNavigate()
 
   const signIn = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password).then(
+      await signInWithEmailAndPassword(auth, email, password)
+      navigate("/dashboard")
+      .then(
         (userCredential) => {
           const user = userCredential.user;
-          console.log(user)
         }
       );
     } catch(error) {
@@ -35,6 +38,7 @@ export const SignIn = () => {
         onChange={(e) => setPassword(e.target.value)}
       ></input>
       <button onClick={signIn}>Sign In</button>
+     
     </div>
   );
 };
