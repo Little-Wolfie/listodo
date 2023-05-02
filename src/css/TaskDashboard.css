@@ -17,24 +17,38 @@ body {
 }
 
 /*List*/
+.accordion-item {
+  border: none;
+}
+.accordion-button::after {
+  display: none;
+}
+.accordion-button:not(.collapsed) {
+  color: white;
+}
+.accordion-button:focus {
+  box-shadow: none;
+  outline: none;
+  background-color: white;
+}
+.accordion-button:focus:not(:hover) {
+  box-shadow: none;
+  outline: none;
+  background-color: white;
+}
+.accordion-button:not(:focus):not(:hover) {
+  background-color: white;
+}
+.accordion-button:not(:focus):hover {
+  background-color: white;
+}
+
 .list-container {
   height: 20rem;
   width: 22rem;
   overflow: scroll;
   background-color: red;
   margin: 0.2rem auto 0.2rem auto;
-}
-.card-container {
-  display: flex;
-  flex-direction: row;
-}
-.task-card {
-  display: flex;
-  flex-direction: column;
-  margin: 0.5rem auto;
-  width: fit-content;
-  height: 3rem;
-  background-color: blueviolet;
 }
 .card-left {
   background-color: aqua;
@@ -46,6 +60,7 @@ body {
   height: 3rem;
 }
 .card-right {
+  overflow: hidden;
   background-color: rgb(44, 118, 118);
   border-top: 1px solid black;
   border-bottom: 1px solid black;
@@ -55,36 +70,10 @@ body {
   height: 3rem;
 }
 .card-right h2, .card-left h2 {
+  text-align: center;
   width: fit-content;
   height: fit-content;
   margin: 0.3rem auto;
-}
-.card-content {
-  display: block;
-  width: 20rem;
-  height: 3rem;
-  background-color: chartreuse;
-  z-index: 1;
-}
-
-.card-slide-open {
-  animation-name: card-slide-open;
-  animation-duration: 1s;
-  animation-fill-mode: forwards;
-}
-.card-slide-closed {
-  animation-name: card-slide-closed;
-  animation-duration: 1s;
-  animation-fill-mode: forwards;
-}
-@keyframes card-slide-open {
-  from {height: 3rem;}
-  to {height: 10rem;}
-  
-}
-@keyframes card-slide-closed {
-  from {height: 10rem;}
-  to {height: 3rem;}
 }
 
 /* FILTER */

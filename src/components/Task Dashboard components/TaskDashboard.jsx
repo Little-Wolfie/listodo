@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import Draggable from 'react-draggable';
-import { Resizable } from 'react-resizable';
-import { Accordion, Button, Card } from 'react-bootstrap';
-import 'react-resizable/css/styles.css';
+import React, { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Accordion from 'react-bootstrap/Accordion';
 import { useNavigate } from 'react-router-dom';
 import '../../css/TaskDashboard.css';
 import Map from './Map';
@@ -28,17 +26,7 @@ const temp = [
 
 export const TaskDashboard = () => {
 	const [tasks, setTasks] = useState(temp);
-	const [expandedCards, setExpandedCards] = useState([]);
 	const navigate = useNavigate();
-
-	const handleTaskCardClick = (e, i) => {
-		setExpandedCards([...expandedCards, i]);
-		setTasks(
-			tasks.map((task, index) =>
-				i === index ? { ...task, expanded: !task.expanded } : task
-			)
-		);
-	};
 
 	return (
 		<div className='task-dashboard'>
@@ -66,10 +54,42 @@ export const TaskDashboard = () => {
 			</p>
 
 			<div className='list-container'>
-				<ol>
+				<Accordion>
 					{tasks.map((task, i) => {
 						return (
-							<li
+							<Accordion.Item
+								eventKey={i}
+								key={i}
+							>
+								<Accordion.Header>
+									<div className='card-left'>
+										<h2>5</h2>
+									</div>
+									<div className='card-right'>
+										<h2>{task.name}</h2>
+									</div>
+								</Accordion.Header>
+								<Accordion.Body>
+									Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea
+									nesciunt deleniti minus quas quae ducimus facilis accusantium
+									placeat, assumenda nostrum, saepe iure quo corrupti quaerat,
+									natus optio esse illo amet.
+								</Accordion.Body>
+							</Accordion.Item>
+						);
+					})}
+				</Accordion>
+			</div>
+
+			<div className='map-wrapper'>
+				<Map />
+			</div>
+		</div>
+	);
+};
+
+{
+	/* <li
 								key={i}
 								onClick={e => handleTaskCardClick(e, i)}
 							>
@@ -87,15 +107,5 @@ export const TaskDashboard = () => {
 										</div>
 									</div>
 								</div>
-							</li>
-						);
-					})}
-				</ol>
-			</div>
-
-			<div className='map-wrapper'>
-				<Map />
-			</div>
-		</div>
-	);
-};
+							</li> */
+}
