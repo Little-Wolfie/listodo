@@ -13,7 +13,6 @@ export const LandingPage = () => {
     setShowRegisterButton(false);
     setShowExistingUserButton(false);
     setRegPopup(true);
-    console.log(regPopup)
   };
   const signInClickHandler = () => {
     setShowExistingUserButton(false);
