@@ -5,7 +5,7 @@ import '../../css/TaskDashboard.css';
 mapboxgl.accessToken =
 	'pk.eyJ1Ijoid29sZmlleCIsImEiOiJjbGd5eTFzZ3EwNXg3M3JveDYzajJ2M2s1In0.2QcQiyjjzt2-vnDY55I94w';
 
-const Map = () => {
+const Map = ({ center = { lng: -0.4, lat: 51 }}) => {
 	const mapContainer = useRef(null);
 	const map = useRef(null);
 
@@ -31,6 +31,13 @@ const Map = () => {
 			}
 		);
 	}, []);
+	
+
+	useEffect(() => {
+		if (map.current) {
+			map.current.flyTo({center: [center.lng, center.lat]})
+		}
+	}, [center])
 
 	return (
 		<div
