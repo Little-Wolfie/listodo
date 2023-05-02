@@ -1,3 +1,8 @@
+body {
+  overflow: hidden;
+}
+
+/* HEADER */
 .header-container {
     width: 100vw;
     height: fit-content;
@@ -6,31 +11,97 @@
     justify-content: space-between;
     background-color: blue;
 }
-
 .header-container button {
-    margin: 3rem 5rem 2rem 5rem;
+    margin: 1rem;
     border-radius: 1rem;
 }
 
+/*List*/
+.accordion-item {
+  border: none;
+}
+.accordion-button::after {
+  display: none;
+}
+.accordion-button:not(.collapsed) {
+  color: white;
+}
+.accordion-button:focus {
+  box-shadow: none;
+  outline: none;
+  background-color: white;
+}
+.accordion-button:focus:not(:hover) {
+  box-shadow: none;
+  outline: none;
+  background-color: white;
+}
+.accordion-button:not(:focus):not(:hover) {
+  background-color: white;
+}
+.accordion-button:not(:focus):hover {
+  background-color: white;
+}
+
 .list-container {
-    height: 25rem;
-    width: 15rem;
-    overflow: scroll;
-    background-color: red;
-    margin: 0rem auto
+  height: 20rem;
+  width: 22rem;
+  overflow: scroll;
+  background-color: red;
+  margin: 0.2rem auto 0.2rem auto;
+}
+.card-left {
+  background-color: aqua;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  border-left: 1px solid black;
+  border-radius: 0.5rem 0 0 0.5rem;
+  width: 3rem;
+  height: 3rem;
+}
+.card-right {
+  overflow: hidden;
+  background-color: rgb(44, 118, 118);
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  border-right: 1px solid black;
+  border-radius: 0 0.5rem 0.5rem 0;
+  width: 17rem;
+  height: 3rem;
+}
+.card-right h2, .card-left h2 {
+  text-align: center;
+  width: fit-content;
+  height: fit-content;
+  margin: 0.3rem auto;
 }
 
-.list-container ol {
-    list-style: none;
-}
-
+/* FILTER */
 .filtering-container {
-    margin: 1rem auto
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  width: 20rem;
+  height: 2rem;
+  background-color: aqua;
+  margin: 0.5rem auto;
 }
 
+/* MAP */
 .map-wrapper {
-    background-color: purple;
-    height: 25rem;
-    width: 15rem;
-    margin: 0rem auto
+  background-color: purple;
+  height: 100rem;
+  width: 100vw;
+  margin: 1rem auto;
+  padding-top: 2rem;
+}
+.map-container {
+  height: 32rem;
+  width: 100%;
+  border: 1px solid #ccc;
+}
+
+.info-small {
+  width: fit-content;
+  margin: 0 auto;
 }
