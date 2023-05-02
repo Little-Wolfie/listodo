@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import Draggable from 'react-draggable';
+import { Resizable } from 'react-resizable';
+import { Accordion, Button, Card } from 'react-bootstrap';
+import 'react-resizable/css/styles.css';
 import { useNavigate } from 'react-router-dom';
 import '../../css/TaskDashboard.css';
+import Map from './Map';
 
 const temp = [
 	{ name: 'Eat Pizza', expanded: false },
@@ -27,9 +32,7 @@ export const TaskDashboard = () => {
 	const navigate = useNavigate();
 
 	const handleTaskCardClick = (e, i) => {
-		console.log(e.target.innerText);
 		setExpandedCards([...expandedCards, i]);
-
 		setTasks(
 			tasks.map((task, index) =>
 				i === index ? { ...task, expanded: !task.expanded } : task
@@ -55,9 +58,13 @@ export const TaskDashboard = () => {
 				<select>
 					<option>Place 1</option>
 				</select>
-				<button>Prioritise!</button>
+				<button>Prioritize!</button>
 			</div>
-			<p className='info-small'>Slide to the left to delete an item</p>
+
+			<p className='info-small'>
+				<em>Slide to the left to delete an item</em>
+			</p>
+
 			<div className='list-container'>
 				<ol>
 					{tasks.map((task, i) => {
@@ -79,17 +86,16 @@ export const TaskDashboard = () => {
 											<h2>{task.name}</h2>
 										</div>
 									</div>
-
-									<div className='card-content'>
-										<h2>hwheh</h2>
-									</div>
 								</div>
 							</li>
 						);
 					})}
 				</ol>
 			</div>
-			<div className='map-wrapper'></div>
+
+			<div className='map-wrapper'>
+				<Map />
+			</div>
 		</div>
 	);
 };
