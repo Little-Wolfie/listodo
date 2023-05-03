@@ -27,6 +27,7 @@ export const CreateTask = ({ map, setTasks }) => {
 		const task = {
 			type: type,
 			// need to deal with scoring
+			//score = (urgency_weight * urgency + importance_weight * importance) / (duration_weight * duration)
 			score: Number(taskUrgency) + Number(taskImportance),
 			name: taskTitle,
 			date: dueDate,
@@ -50,7 +51,7 @@ export const CreateTask = ({ map, setTasks }) => {
 				accessToken: mapboxgl.accessToken,
 				mapboxgl: mapboxgl,
 				marker: false,
-				placeholder: 'Enter a location',
+				placeholder: 'Enter a location...',
 			});
 
 			geocoder.on('result', e => {
@@ -77,12 +78,12 @@ export const CreateTask = ({ map, setTasks }) => {
 						value={type}
 						onChange={e => setType(e.target.value)}
 					>
-						<option value='task'>Task</option>
-						<option value='appointment'>Appointment</option>
-						<option value='meeting'>Meeting</option>
+						<option value='Task'>Task</option>
+						<option value='Appointment'>Appointment</option>
+						<option value='Meeting'>Meeting</option>
 						<option value='Business'>Business</option>
-						<option value='personal'>Personal</option>
-						<option value='job'>Job</option>
+						<option value='Personal'>Personal</option>
+						<option value='Job'>Job</option>
 					</select>
 
 					<label htmlFor='input-title'>Task title</label>
