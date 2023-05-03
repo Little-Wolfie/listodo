@@ -8,6 +8,7 @@
     background-color: blue;
 }
 
+/*
 h2 {
     display: flex;
     justify-content: center;
@@ -16,6 +17,7 @@ h2 {
     height: 15vh;
     background-color: red;
 }
+*/
 
 form {
     display: flex;
