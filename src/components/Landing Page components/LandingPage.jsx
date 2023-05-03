@@ -13,7 +13,6 @@ export const LandingPage = () => {
     setShowRegisterButton(false);
     setShowExistingUserButton(false);
     setRegPopup(true);
-    console.log(regPopup)
   };
   const signInClickHandler = () => {
     setShowExistingUserButton(false);
@@ -23,24 +22,27 @@ export const LandingPage = () => {
   };
   return (
     <main className="flex-box">
-    <div className="landing-page-container">
-      <div className="landing-page">
-        <div className="logo"></div>
-        {showRegisterButton && (
-          <button className="register-button" onClick={regClickHandler}>
-            Register
-          </button>
-        )}
+      <div className="landing-page-container">
+        <div className="landing-page">
+          <div className="logo"></div>
+          {showRegisterButton && (
+            <button className="register-button" onClick={regClickHandler}>
+              Register
+            </button>
+          )}
 
-        {regPopup && <Register />}
-        {showExistingUserButton && (
-          <button className="existing-user-button"  onClick={signInClickHandler}>
-            Existing User
-          </button>
-        )}
-        {signInPopup && <SignIn />}
+          {regPopup && <Register />}
+          {showExistingUserButton && (
+            <button
+              className="existing-user-button"
+              onClick={signInClickHandler}
+            >
+              Existing User
+            </button>
+          )}
+          {signInPopup && <SignIn />}
+        </div>
       </div>
-    </div>
-  </main>
+    </main>
   );
 };
