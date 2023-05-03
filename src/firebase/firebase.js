@@ -1,7 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getAuth, collection } from "firebase/auth"
-import { getFirestore } from "firebase/firestore"
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCy5PEXtaaufaEmUzE-x41nzBASEwNh2gg",
@@ -10,11 +11,13 @@ const firebaseConfig = {
   storageBucket: "listodo-f5e57.appspot.com",
   messagingSenderId: "329415732884",
   appId: "1:329415732884:web:c0e63e3671a38169d1ce81",
-  measurementId: "G-0YNW7TJH5T"
+  measurementId: "G-0YNW7TJH5T",
 };
 
 const app = initializeApp(firebaseConfig);
+
 const analytics = getAnalytics(app);
 
-export const auth = getAuth(app)
-export const db = getFirestore(app)
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);

@@ -8,21 +8,20 @@ export const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
-  const navigate = useNavigate()
-  const {user, setUser} = useContext(UserContext)
+  const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext);
 
   const signIn = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password)
-      .then(
+      await signInWithEmailAndPassword(auth, email, password).then(
         (userCredential) => {
-          setUser(userCredential.user)
-          navigate("/dashboard")
+          setUser(userCredential.user);
+          navigate("/dashboard");
         }
       );
-    } catch(error) {
+    } catch (error) {
       console.error(error);
-      setError(error)
+      setError(error);
     }
   };
   return (
@@ -40,7 +39,6 @@ export const SignIn = () => {
         onChange={(e) => setPassword(e.target.value)}
       ></input>
       <button onClick={signIn}>Sign In</button>
-     
     </div>
   );
 };
