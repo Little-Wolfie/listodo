@@ -13,8 +13,7 @@ const MARKER_COLORS = {
 	Job: 'orange',
 };
 
-mapboxgl.accessToken =
-	'pk.eyJ1Ijoid29sZmlleCIsImEiOiJjbGd5eTFzZ3EwNXg3M3JveDYzajJ2M2s1In0.2QcQiyjjzt2-vnDY55I94w';
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
 const Map = ({ center, locations, map }) => {
 	const [markers, setMarkers] = useState([]);
