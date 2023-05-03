@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Accordion from 'react-bootstrap/Accordion';
 import { useNavigate } from 'react-router-dom';
@@ -49,6 +49,20 @@ export const TaskDashboard = ({ map, tasks, setTasks }) => {
 		setCenter(taskLocation);
 	};
 
+	const sortTasksByScore = () => {
+		setTasks(current => {
+			const sortedTasks = current
+				.slice()
+				.sort((a, b) => b['score'] - a['score']);
+
+			return sortedTasks;
+		});
+	};
+
+	useEffect(() => {
+		sortTasksByScore();
+	}, []);
+
 	return (
 		<div className='task-dashboard'>
 			<header>
@@ -69,11 +83,12 @@ export const TaskDashboard = ({ map, tasks, setTasks }) => {
 					</button>
 				</div>
 			</header>
+
 			<div className='filtering-container'>
 				<select>
 					<option>Place 1</option>
 				</select>
-				<button>Prioritize!</button>
+				<button onClick={sortTasksByScore}>Prioritize!</button>
 			</div>
 
 			<p className='info-small'>
@@ -96,6 +111,7 @@ export const TaskDashboard = ({ map, tasks, setTasks }) => {
 										<h2>{task.name}</h2>
 									</div>
 								</Accordion.Header>
+
 								<Accordion.Body>
 									<p>
 										<em>{task.type}</em>

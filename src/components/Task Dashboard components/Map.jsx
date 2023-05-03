@@ -2,6 +2,16 @@ import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '../../css/TaskDashboard.css';
+import '../../css/TaskDashboard.css';
+
+const MARKER_COLORS = {
+	Task: 'red',
+	Appointment: 'blue',
+	Meeting: 'green',
+	Business: 'yellow',
+	Personal: 'pink',
+	Job: 'orange',
+};
 
 mapboxgl.accessToken =
 	'pk.eyJ1Ijoid29sZmlleCIsImEiOiJjbGd5eTFzZ3EwNXg3M3JveDYzajJ2M2s1In0.2QcQiyjjzt2-vnDY55I94w';
@@ -12,12 +22,18 @@ const Map = ({ center, locations, map }) => {
 
 	const createMarkers = () => {
 		return locations.map(location => {
-			const m = new mapboxgl.Marker({ color: '#0000FF' })
+			const m = new mapboxgl.Marker({ color: MARKER_COLORS[location.type] })
 				.setLngLat([location.location.lng, location.location.lat])
 				.addTo(map.current);
 
 			const popup = new mapboxgl.Popup({ offset: 35 }).setHTML(
-				`<h3>${location.name}</h3>`
+				`
+        <div class="popup-content">
+          <h6><strong>${location.name}</strong></h6>
+          <p>${location.time}</p>
+          <p>${location.date}</p>
+        </div>
+        `
 			);
 
 			m.setPopup(popup);
