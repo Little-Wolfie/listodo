@@ -1,0 +1,26 @@
+.page-title {
+    background-color: #333;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+}
+  
+  .header-logo {
+    color: white;
+    margin: 0;
+    display: inline-block;
+    list-style: none;
+    padding: 0;
+    border: none;
+    text-align: center;
+  }
+  .header-link {
+   text-decoration: none;
+  display: flex;
+  align-items: center;;
+  }
+    
+  
+  
+
+  
