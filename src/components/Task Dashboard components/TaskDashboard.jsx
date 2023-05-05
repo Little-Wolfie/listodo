@@ -90,12 +90,6 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
       </header>
 
 
-      <div className="filtering-container">
-        <select>
-          <option>Place 1</option>
-        </select>
-        <button onClick={sortTasksByScore}>Prioritize!</button>
-      </div>
 
 			<div className='filtering-container'>
         <p>Sort</p>
