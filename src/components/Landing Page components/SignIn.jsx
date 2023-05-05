@@ -3,6 +3,8 @@ import { auth } from "../../firebase/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
+import { Form, Button, InputGroup, FormControl  } from "react-bootstrap";
+import { FaEnvelope, FaLock } from "react-icons/fa";
 
 export const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -25,20 +27,37 @@ export const SignIn = () => {
     }
   };
   return (
-    <div>
-      <input
-        placeholder="email"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      ></input>
-      <input
-        placeholder="password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      ></input>
-      <button onClick={signIn}>Sign In</button>
-    </div>
+    <Form>
+      <Form.Group className="mb-3" controlId="formBasicEmail">
+        <Form.Label>Email address</Form.Label>
+        <InputGroup>
+          <InputGroup.Text>
+            <FaEnvelope />
+          </InputGroup.Text>
+          <FormControl
+            placeholder="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </InputGroup>
+      </Form.Group>
+
+      <Form.Group className="mb-3" controlId="formBasicPassword">
+        <Form.Label>Password</Form.Label>
+        <InputGroup>
+        <InputGroup.Text>
+        <FaLock />
+        </InputGroup.Text>
+        <FormControl
+          placeholder="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        </InputGroup>
+      </Form.Group>
+      <Button onClick={signIn}>Sign In</Button>
+    </Form>
   );
 };

@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Accordion from 'react-bootstrap/Accordion';
-import { useNavigate } from 'react-router-dom';
-import '../../css/TaskDashboard.css';
-import Map from './Map';
-import 'react-datepicker/dist/react-datepicker.css';
+import React, { useEffect, useRef, useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import Accordion from "react-bootstrap/Accordion";
+import { useNavigate } from "react-router-dom";
+import "../../css/TaskDashboard.css";
+import Map from "./Map";
+import "react-datepicker/dist/react-datepicker.css";
 
 export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 	const navigate = useNavigate();
