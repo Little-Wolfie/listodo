@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "../../css/Profile.css";
-import { updatePassword, onAuthStateChanged } from "firebase/auth";
+import { updatePassword, onAuthStateChanged} from "firebase/auth";
 import { auth } from "../../firebase/firebase";
 import { storage } from "../../firebase/firebase";
 import { ref, uploadBytesResumable } from "firebase/storage";
 import CompletedTasks from "./CompletedTasks";
+import SignOutButton from "./SignOutButton";
+
+
+
 
 export const Profile = () => {
   const [showChangePasswordFields, setShowChangePasswordFields] =
@@ -23,7 +27,7 @@ export const Profile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-
+  
   useEffect(() => {
     const getUsersEmail = () => {
       onAuthStateChanged(auth, (userAuth) => {
@@ -34,7 +38,8 @@ export const Profile = () => {
     };
     getUsersEmail();
   }, []);
-
+  
+ 
   const imageRef = ref(storage, "images/" + File.name);
 
   const handleImageSubmit = () => {
@@ -89,6 +94,9 @@ export const Profile = () => {
         />
       </header>
       <div className="profile-container">
+      
+      <SignOutButton />
+        
         {showChangeImageButton && (
           <button
             className="profile-img"
