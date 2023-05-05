@@ -15,27 +15,27 @@ const MARKER_COLORS = {
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
-const Map = ({ center, locations, map, setActiveKey }) => {
+const Map = ({ center, tasks, map, setActiveKey }) => {
 	const [markers, setMarkers] = useState([]);
 	const mapContainerRef = useRef(null);
 
 	const createMarkers = () => {
-  const sortedTask = locations.slice().sort((a, b) => b.score - a.score)[0];
+  const sortedTask = tasks.slice().sort((a, b) => b.score - a.score)[0];
 
-  return locations.map((location) => {
+  return tasks.map((task) => {
     const isSortedTask =
-      JSON.stringify(location) === JSON.stringify(sortedTask);
+      JSON.stringify(task) === JSON.stringify(sortedTask);
 
-    const m = new mapboxgl.Marker({ color: MARKER_COLORS[location.type] })
-      .setLngLat([location.location.lng, location.location.lat])
+    const m = new mapboxgl.Marker({ color: MARKER_COLORS[task.type] })
+      .setLngLat([task.location.lng, task.location.lat])
       .addTo(map.current);
 
     const popup = new mapboxgl.Popup({ offset: 35 }).setHTML(
       `
         <div class="popup-content">
-          <h6><strong>${location.name}</strong></h6>
-          <p>${location.time}</p>
-          <p>${location.date}</p>
+          <h6><strong>${task.name}</strong></h6>
+          <p>${task.time}</p>
+          <p>${task.date}</p>
         </div>
       `
     );
@@ -43,8 +43,8 @@ const Map = ({ center, locations, map, setActiveKey }) => {
     m.setPopup(popup);
 
     m.getElement().addEventListener('click', () => {
-      setActiveKey(location.id.toString());
-      map.current.flyTo({ center: [location.location.lng, location.location.lat], zoom: 12 });
+      setActiveKey(task.id.toString());
+      map.current.flyTo({ center: [task.location.lng, task.location.lat], zoom: 14 });
     });
 
     if (isSortedTask) {
@@ -69,11 +69,11 @@ const Map = ({ center, locations, map, setActiveKey }) => {
         zoom: 12,
       });
 
-      const sortedTasks = locations
+      const sortedTasks = tasks
 				.slice()
 				.sort((a, b) => b.score - a.score);
 
-		  map.current.flyTo({ center: [sortedTasks[0].location.lng, sortedTasks[0].location.lat], zoom: 12 });
+		  map.current.flyTo({ center: [sortedTasks[0].location.lng, sortedTasks[0].location.lat], zoom: 14 });
 
       map.current.on('load', () => {
       // do something on map load later
@@ -105,15 +105,15 @@ const Map = ({ center, locations, map, setActiveKey }) => {
 
 
 	useEffect(() => {
-		if (map.current && locations.length > 0) {
+		if (map.current && tasks.length > 0) {
 			const newMarkers = createMarkers();
 			setMarkers(newMarkers);
 		}
-	}, [locations]);
+	}, [tasks]);
 
 	useEffect(() => {
 		if (map.current) {
-			map.current.flyTo({ center: [center.lng, center.lat], zoom: 12 });
+			map.current.flyTo({ center: [center.lng, center.lat], zoom: 14 });
 		}
 	}, [center]);
 

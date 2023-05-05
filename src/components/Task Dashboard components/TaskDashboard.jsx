@@ -173,7 +173,7 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 			<div className='map-wrapper'>
 				<Map
 					center={center}
-					locations={tasks}
+					tasks={tasks}
 					map={map}
           setActiveKey={setActiveKey}
 				/>
