@@ -6,62 +6,67 @@ import "../../css/TaskDashboard.css";
 import Map from "./Map";
 import "react-datepicker/dist/react-datepicker.css";
 
-export const TaskDashboard = ({ map, tasks, setTasks }) => {
-  const navigate = useNavigate();
-  const [editableIndex, setEditableIndex] = useState(null);
-  const [editText, setEditText] = useState("");
-  const [center, setCenter] = useState({ lng: -0.4, lat: 51 });
+export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
+	const navigate = useNavigate();
+	const [editableIndex, setEditableIndex] = useState(null);
+	const [editText, setEditText] = useState('');
+	const [center, setCenter] = useState({ lng: -0.4, lat: 51 });
+  const orderRef = useRef(null);
 
-  const handleEditClick = (index) => {
-    setEditableIndex(index);
-  };
+	const handleSaveClick = i => {
+		setTaskUtil(i, 'description', editText);
+		setEditableIndex(null);
+		setEditText('');
+	};
 
-  const handleTextAreaChange = (e) => {
-    setEditText(e.target.value);
-  };
+	const handleTimeDateChange = (index, value, key) => {
+		setTaskUtil(index, key, value);
+	};
 
-  const handleSaveClick = (i) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task, index) =>
-        i === index ? { ...task, description: editText } : task
-      )
-    );
-    setEditableIndex(null);
-    setEditText("");
-  };
+  const setTaskUtil = (index, key, value) => {
+    setTasks(prevTasks =>
+			prevTasks.map((task, i) => {
+				if (i === index) task[key] = value;
+        return task;
+      })
+		);
+  }
 
-  const handleTimeChange = (index, value) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task, i) =>
-        i === index ? { ...task, time: value } : task
-      )
-    );
-  };
-  const handleDateChange = (index, value) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task, i) =>
-        i === index ? { ...task, date: value } : task
-      )
-    );
-  };
+  const sortTasks = (sort) => {
+  setTasks(current => {
+    const sortedTasks = current
+      .slice()
+      .sort((a, b) => {
+        if (sort === 'time') {
+          const aDateTime = new Date(`${a.date}T${a.time}`);
+          const bDateTime = new Date(`${b.date}T${b.time}`);
+          return aDateTime - bDateTime;
+        } else if (typeof a[sort] === 'number') {
+          return b[sort] - a[sort];
+        } else {
+          return a[sort].localeCompare(b[sort]);
+        }
+      });
 
-  const handleShowOnMap = (taskLocation) => {
-    setCenter(taskLocation);
-  };
+    if (orderRef.current) orderRef.current.value = 'desc'
+    return sortedTasks;
+  });
+}
 
-  const sortTasksByScore = () => {
-    setTasks((current) => {
-      const sortedTasks = current
+  const orderTasks = () => {
+    setTasks(current => {
+      const orderedTasks = current
         .slice()
-        .sort((a, b) => b["score"] - a["score"]);
+        .reverse();
+      
+      return orderedTasks;
+    })
+  }
 
-      return sortedTasks;
-    });
-  };
+	useEffect(() => {
+		sortTasks('score');
+	}, []);
 
-  useEffect(() => {
-    sortTasksByScore();
-  }, []);
 
   return (
     <div className="task-dashboard">
@@ -84,12 +89,32 @@ export const TaskDashboard = ({ map, tasks, setTasks }) => {
         </div>
       </header>
 
+
       <div className="filtering-container">
         <select>
           <option>Place 1</option>
         </select>
         <button onClick={sortTasksByScore}>Prioritize!</button>
       </div>
+
+			<div className='filtering-container'>
+        <p>Sort</p>
+				<select onChange={e => sortTasks(e.target.value)}>
+					<option value='score'>Score</option>
+          <option value='name'>Name</option>
+          <option value='time'>Time/Date</option>
+          <option value='duration'>Duration</option>
+          <option value='type'>Type</option>
+				</select>
+
+        <p>Order</p>
+        <select onChange={() => orderTasks()} ref={orderRef}>
+					<option value='desc'>Desc</option>
+          <option value='asc'>Asc</option>
+				</select>
+				<button onClick={() => sortTasks('score')}>Auto</button>
+			</div>
+
 
       <p className="info-small">
         <em>Slide to the left to delete an item</em>
@@ -108,6 +133,7 @@ export const TaskDashboard = ({ map, tasks, setTasks }) => {
                     <h2>{task.name}</h2>
                   </div>
                 </Accordion.Header>
+
 
                 <Accordion.Body>
                   <p>
@@ -148,6 +174,7 @@ export const TaskDashboard = ({ map, tasks, setTasks }) => {
           })}
         </Accordion>
       </div>
+
 
       <div className="map-wrapper">
         <Map center={center} locations={tasks} map={map} />
