@@ -5,6 +5,10 @@ import { auth } from "../../firebase/firebase";
 import { storage } from "../../firebase/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import CompletedTasks from "./CompletedTasks";
+import SignOutButton from "./SignOutButton";
+
+
+
 
 export const Profile = () => {
   const [showChangePasswordFields, setShowChangePasswordFields] =
@@ -37,8 +41,8 @@ export const Profile = () => {
       });
     };
     getUserDetails()
-
   }, []);
+
 
   const handleImageSubmit = (e) => {
     e.preventDefault();
@@ -108,6 +112,9 @@ export const Profile = () => {
         />
       </header>
       <div className="profile-container">
+      
+      <SignOutButton />
+        
         {showChangeImageButton && (
           <button
             className="profile-img"

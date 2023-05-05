@@ -17,7 +17,7 @@ mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
 const Map = ({ center, locations, map }) => {
 	const [markers, setMarkers] = useState([]);
-	const mapContainer = useRef(null);
+	const mapContainerRef = useRef(null);
 
 	const createMarkers = () => {
 		return locations.map(location => {
@@ -41,33 +41,51 @@ const Map = ({ center, locations, map }) => {
 	};
 
 	useEffect(() => {
-		if (map.current) return;
-		navigator.geolocation.getCurrentPosition(
-			position => {
-				const { longitude, latitude } = position.coords;
-				map.current = new mapboxgl.Map({
-					container: mapContainer.current,
-					style: 'mapbox://styles/wolfiex/clh7da82l01lm01p4dnoohyo3',
-					center: [longitude, latitude],
-					zoom: 12,
-				});
+    if (map.current) return; // Avoid reinitializing the map
 
-				const newMarkers = createMarkers();
-				setMarkers(newMarkers);
-			},
-			() => {
-				map.current = new mapboxgl.Map({
-					container: mapContainer.current,
-					style: 'mapbox://styles/wolfiex/clh7da82l01lm01p4dnoohyo3',
-					center: [-0.4, 51],
-					zoom: 12,
-				});
+    const initializeMap = (coords) => {
+      const { longitude, latitude } = coords;
+      map.current = new mapboxgl.Map({
+        container: mapContainerRef.current,
+        style: 'mapbox://styles/wolfiex/clh7da82l01lm01p4dnoohyo3',
+        center: [longitude, latitude],
+        zoom: 12,
+      });
 
-				const newMarkers = createMarkers();
-				setMarkers(newMarkers);
-			}
-		);
-	}, []);
+      const sortedTasks = locations
+				.slice()
+				.sort((a, b) => b.score - a.score);
+
+		  map.current.flyTo({ center: [sortedTasks[0].location.lng, sortedTasks[0].location.lat], zoom: 12 });
+
+      map.current.on('load', () => {
+      // do something on map load later
+      })
+
+      const newMarkers = createMarkers(map.current);
+      setMarkers(newMarkers);
+    };
+
+    
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        initializeMap(position.coords);
+      },
+      () => {
+        initializeMap({ longitude: -0.4, latitude: 51 });
+      }
+    );
+
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+    };
+  }, [map]);
+
+
 
 	useEffect(() => {
 		if (map.current && locations.length > 0) {
@@ -78,14 +96,14 @@ const Map = ({ center, locations, map }) => {
 
 	useEffect(() => {
 		if (map.current) {
-			map.current.flyTo({ center: [center.lng, center.lat], zoom: 16 });
+			map.current.flyTo({ center: [center.lng, center.lat], zoom: 12 });
 		}
 	}, [center]);
 
 	return (
 		<div
 			className='map-container'
-			ref={mapContainer}
+			ref={mapContainerRef}
 		/>
 	);
 };
