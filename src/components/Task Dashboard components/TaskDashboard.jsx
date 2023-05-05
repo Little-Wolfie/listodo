@@ -68,10 +68,6 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 		sortTasks('score');
 	}, []);
 
-  useEffect(() => {
-    console.log(tasks);
-  }, [tasks])
-
 	return (
 		<div className='task-dashboard'>
 			<header>
@@ -116,7 +112,8 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 			</p>
 
 			<div className='list-container'>
-				<Accordion activeKey={activeKey}>
+				<Accordion activeKey={activeKey} onSelect={(selectedKey) => setActiveKey((prevKey) => prevKey === selectedKey ? null : selectedKey)}>
+
 					{tasks.map((task, i) => {
 						return (
 							<Accordion.Item
