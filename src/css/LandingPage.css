@@ -1,16 +1,25 @@
-body {
-  background-color: bisque;
+#my-body {
+  background-image: url("./images/map.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-height: 100vh;
+  
 }
+
 .landing-page-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-evenly;
-  margin: 50% auto;
-  background-color: green;
-  width: 20rem;
-  height: 20rem;
-  border-radius: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgb(47, 207, 180);
+  width: 25rem;
+  height: 35rem;
+  border-radius: 2rem;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 10);
 }
 
 .landing-page-container button {
@@ -19,31 +28,42 @@ body {
 }
 
 .logo {
-  width: 200px;
-  height: 100px;
-  background-color: burlywood;
-}
-.register-button {
-  background-color: #4caf50;
+  background-color: rgb(46, 91, 216);
+  padding: 20px;
+  border-radius: 20px;
   color: white;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+  height: 8rem;
+  width: 20rem;
+  margin-bottom: 30px;
+  text-align: center;
 }
-.existing-user-button {
-  background-color: rgb(157, 78, 78);
-  color: white;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
-}
+
 input {
   display: flex;
   margin: 20px auto;
+}
+
+/* For devices with a maximum width of 600px */
+
+@media only screen and (max-width: 600px) {
+  .landing-page-container {
+    width: 90%;
+    height: 70%;
+  }
+
+  .logo {
+    font-size: 20px;
+    height: 6rem;
+    width: 16rem;
+  }
+
+  input {
+    width: 80%;
+  }
 }
