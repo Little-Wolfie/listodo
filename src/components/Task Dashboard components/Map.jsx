@@ -44,6 +44,7 @@ const Map = ({ center, locations, map, setActiveKey }) => {
 
     m.getElement().addEventListener('click', () => {
       setActiveKey(location.id.toString());
+      map.current.flyTo({ center: [location.location.lng, location.location.lat], zoom: 12 });
     });
 
     if (isSortedTask) {
