@@ -11,6 +11,7 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 	const [editableIndex, setEditableIndex] = useState(null);
 	const [editText, setEditText] = useState('');
 	const [center, setCenter] = useState({ lng: -0.4, lat: 51 });
+  const [activeKey, setActiveKey] = useState(null);
   const orderRef = useRef(null);
 
 	const handleSaveClick = i => {
@@ -33,25 +34,25 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
   }
 
   const sortTasks = (sort) => {
-  setTasks(current => {
-    const sortedTasks = current
-      .slice()
-      .sort((a, b) => {
-        if (sort === 'time') {
-          const aDateTime = new Date(`${a.date}T${a.time}`);
-          const bDateTime = new Date(`${b.date}T${b.time}`);
-          return aDateTime - bDateTime;
-        } else if (typeof a[sort] === 'number') {
-          return b[sort] - a[sort];
-        } else {
-          return a[sort].localeCompare(b[sort]);
-        }
-      });
+    setTasks(current => {
+      const sortedTasks = current
+        .slice()
+        .sort((a, b) => {
+          if (sort === 'time') {
+            const aDateTime = new Date(`${a.date}T${a.time}`);
+            const bDateTime = new Date(`${b.date}T${b.time}`);
+            return aDateTime - bDateTime;
+          } else if (typeof a[sort] === 'number') {
+            return b[sort] - a[sort];
+          } else {
+            return a[sort].localeCompare(b[sort]);
+          }
+        });
 
-    if (orderRef.current) orderRef.current.value = 'desc'
-    return sortedTasks;
-  });
-}
+      if (orderRef.current) orderRef.current.value = 'desc'
+      return sortedTasks;
+    });
+  }
 
   const orderTasks = () => {
     setTasks(current => {
@@ -66,6 +67,10 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 	useEffect(() => {
 		sortTasks('score');
 	}, []);
+
+  useEffect(() => {
+    console.log(tasks);
+  }, [tasks])
 
 	return (
 		<div className='task-dashboard'>
@@ -111,12 +116,13 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 			</p>
 
 			<div className='list-container'>
-				<Accordion>
+				<Accordion activeKey={activeKey}>
 					{tasks.map((task, i) => {
 						return (
 							<Accordion.Item
-								eventKey={i}
+								eventKey={task.id.toString()}
 								key={i}
+                id={`accordion-item-${task.id}`}
 							>
 								<Accordion.Header>
 									<div className='card-left'>
@@ -172,6 +178,7 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 					center={center}
 					locations={tasks}
 					map={map}
+          setActiveKey={setActiveKey}
 				/>
 			</div>
 		</div>
