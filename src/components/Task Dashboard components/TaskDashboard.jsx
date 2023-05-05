@@ -6,61 +6,65 @@ import '../../css/TaskDashboard.css';
 import Map from './Map';
 import 'react-datepicker/dist/react-datepicker.css';
 
-export const TaskDashboard = ({ map, tasks, setTasks }) => {
+export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 	const navigate = useNavigate();
 	const [editableIndex, setEditableIndex] = useState(null);
 	const [editText, setEditText] = useState('');
 	const [center, setCenter] = useState({ lng: -0.4, lat: 51 });
-
-	const handleEditClick = index => {
-		setEditableIndex(index);
-	};
-
-	const handleTextAreaChange = e => {
-		setEditText(e.target.value);
-	};
+  const orderRef = useRef(null);
 
 	const handleSaveClick = i => {
-		setTasks(prevTasks =>
-			prevTasks.map((task, index) =>
-				i === index ? { ...task, description: editText } : task
-			)
-		);
+		setTaskUtil(i, 'description', editText);
 		setEditableIndex(null);
 		setEditText('');
 	};
 
-	const handleTimeChange = (index, value) => {
-		setTasks(prevTasks =>
-			prevTasks.map((task, i) =>
-				i === index ? { ...task, time: value } : task
-			)
+	const handleTimeDateChange = (index, value, key) => {
+		setTaskUtil(index, key, value);
+	};
+
+  const setTaskUtil = (index, key, value) => {
+    setTasks(prevTasks =>
+			prevTasks.map((task, i) => {
+				if (i === index) task[key] = value;
+        return task;
+      })
 		);
-	};
-	const handleDateChange = (index, value) => {
-		setTasks(prevTasks =>
-			prevTasks.map((task, i) =>
-				i === index ? { ...task, date: value } : task
-			)
-		);
-	};
+  }
 
-	const handleShowOnMap = taskLocation => {
-		setCenter(taskLocation);
-	};
+  const sortTasks = (sort) => {
+  setTasks(current => {
+    const sortedTasks = current
+      .slice()
+      .sort((a, b) => {
+        if (sort === 'time') {
+          const aDateTime = new Date(`${a.date}T${a.time}`);
+          const bDateTime = new Date(`${b.date}T${b.time}`);
+          return aDateTime - bDateTime;
+        } else if (typeof a[sort] === 'number') {
+          return b[sort] - a[sort];
+        } else {
+          return a[sort].localeCompare(b[sort]);
+        }
+      });
 
-	const sortTasksByScore = () => {
-		setTasks(current => {
-			const sortedTasks = current
-				.slice()
-				.sort((a, b) => b['score'] - a['score']);
+    if (orderRef.current) orderRef.current.value = 'desc'
+    return sortedTasks;
+  });
+}
 
-			return sortedTasks;
-		});
-	};
+  const orderTasks = () => {
+    setTasks(current => {
+      const orderedTasks = current
+        .slice()
+        .reverse();
+      
+      return orderedTasks;
+    })
+  }
 
 	useEffect(() => {
-		sortTasksByScore();
+		sortTasks('score');
 	}, []);
 
 	return (
@@ -85,10 +89,21 @@ export const TaskDashboard = ({ map, tasks, setTasks }) => {
 			</header>
 
 			<div className='filtering-container'>
-				<select>
-					<option>Place 1</option>
+        <p>Sort</p>
+				<select onChange={e => sortTasks(e.target.value)}>
+					<option value='score'>Score</option>
+          <option value='name'>Name</option>
+          <option value='time'>Time/Date</option>
+          <option value='duration'>Duration</option>
+          <option value='type'>Type</option>
 				</select>
-				<button onClick={sortTasksByScore}>Prioritize!</button>
+
+        <p>Order</p>
+        <select onChange={() => orderTasks()} ref={orderRef}>
+					<option value='desc'>Desc</option>
+          <option value='asc'>Asc</option>
+				</select>
+				<button onClick={() => sortTasks('score')}>Auto</button>
 			</div>
 
 			<p className='info-small'>
@@ -119,19 +134,19 @@ export const TaskDashboard = ({ map, tasks, setTasks }) => {
 									<input
 										type='time'
 										value={task.time}
-										onChange={e => handleTimeChange(i, e.target.value)}
+										onChange={e => handleTimeDateChange(i, e.target.value, 'time')}
 									/>
 									<input
 										type='date'
 										value={task.date}
-										onChange={e => handleDateChange(i, e.target.value)}
+										onChange={e => handleTimeDateChange(i, e.target.value, 'date')}
 									/>
 									{editableIndex === i ? (
 										<textarea
 											style={{ height: '180px', width: '300px' }}
 											type='text'
 											defaultValue={task.description}
-											onChange={handleTextAreaChange}
+											onChange={(e) => setEditText(e.target.value)}
 										/>
 									) : (
 										task.description
@@ -139,9 +154,9 @@ export const TaskDashboard = ({ map, tasks, setTasks }) => {
 									{editableIndex === i ? (
 										<button onClick={() => handleSaveClick(i)}>Save</button>
 									) : (
-										<button onClick={() => handleEditClick(i)}>Edit</button>
+										<button onClick={() => setEditableIndex(i)}>Edit</button>
 									)}
-									<button onClick={() => handleShowOnMap(task.location)}>
+									<button onClick={() => setCenter(task.location)}>
 										Show On Map
 									</button>
 									<button>Completed</button>
