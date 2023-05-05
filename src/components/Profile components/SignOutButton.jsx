@@ -10,7 +10,6 @@ const SignOutButton = () => {
   const handleSignOutClick = async () => {
     signOut(auth)
       .then(() => {
-        console.log(auth)
         navigate("/login");
       })
       .catch((error) => {
