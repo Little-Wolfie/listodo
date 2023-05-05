@@ -15,30 +15,46 @@ const MARKER_COLORS = {
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
-const Map = ({ center, locations, map }) => {
+const Map = ({ center, locations, map, setActiveKey }) => {
 	const [markers, setMarkers] = useState([]);
 	const mapContainerRef = useRef(null);
 
 	const createMarkers = () => {
-		return locations.map(location => {
-			const m = new mapboxgl.Marker({ color: MARKER_COLORS[location.type] })
-				.setLngLat([location.location.lng, location.location.lat])
-				.addTo(map.current);
+  const sortedTask = locations.slice().sort((a, b) => b.score - a.score)[0];
 
-			const popup = new mapboxgl.Popup({ offset: 35 }).setHTML(
-				`
+  return locations.map((location) => {
+    const isSortedTask =
+      JSON.stringify(location) === JSON.stringify(sortedTask);
+
+    const m = new mapboxgl.Marker({ color: MARKER_COLORS[location.type] })
+      .setLngLat([location.location.lng, location.location.lat])
+      .addTo(map.current);
+
+    const popup = new mapboxgl.Popup({ offset: 35 }).setHTML(
+      `
         <div class="popup-content">
           <h6><strong>${location.name}</strong></h6>
           <p>${location.time}</p>
           <p>${location.date}</p>
         </div>
-        `
-			);
+      `
+    );
 
-			m.setPopup(popup);
-			return m;
-		});
-	};
+    m.setPopup(popup);
+
+    m.getElement().addEventListener('click', () => {
+      setActiveKey(location.id.toString());
+    });
+
+    if (isSortedTask) {
+      m.togglePopup(); 
+    }
+
+    
+
+    return m;
+  });
+};
 
 	useEffect(() => {
     if (map.current) return; // Avoid reinitializing the map
@@ -62,7 +78,7 @@ const Map = ({ center, locations, map }) => {
       // do something on map load later
       })
 
-      const newMarkers = createMarkers(map.current);
+      const newMarkers = createMarkers();
       setMarkers(newMarkers);
     };
 

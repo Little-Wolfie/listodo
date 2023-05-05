@@ -12,6 +12,7 @@ import { useRef, useState } from "react";
 
 const temp = [
   {
+    id: 1,
     type: "Business",
     score: 3,
     name: "Eat Pizza",
@@ -23,6 +24,7 @@ const temp = [
       "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsum, accusantium error dolor atque numquam mollitia sint quae saepe illum deleniti. Asperiores, excepturi pariatur quibusdam vitae nesciunt quia. Aliquid, voluptatem! Dignissimos?",
   },
   {
+    id: 2,
     type: "Personal",
     score: 5,
     name: "Netflix n chill",
@@ -34,6 +36,7 @@ const temp = [
       "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsum, accusantium error dolor atque numquam mollitia sint quae saepe illum deleniti. Asperiores, excepturi pariatur quibusdam vitae nesciunt quia. Aliquid, voluptatem! Dignissimos?",
   },
   {
+    id: 3,
     type: "Appointment",
     score: 1,
     name: "Dental",
@@ -45,6 +48,7 @@ const temp = [
       "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsum, accusantium error dolor atque numquam mollitia sint quae saepe illum deleniti. Asperiores, excepturi pariatur quibusdam vitae nesciunt quia. Aliquid, voluptatem! Dignissimos?",
   },
   {
+    id: 4,
     type: "Business",
     score: 7,
     name: "Some job over there",
@@ -56,6 +60,7 @@ const temp = [
       "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsum, accusantium error dolor atque numquam mollitia sint quae saepe illum deleniti. Asperiores, excepturi pariatur quibusdam vitae nesciunt quia. Aliquid, voluptatem! Dignissimos?",
   },
   {
+    id: 5,
     type: "Meeting",
     score: 8,
     name: "Cut grass",
@@ -67,6 +72,7 @@ const temp = [
       "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsum, accusantium error dolor atque numquam mollitia sint quae saepe illum deleniti. Asperiores, excepturi pariatur quibusdam vitae nesciunt quia. Aliquid, voluptatem! Dignissimos?",
   },
   {
+    id: 6,
     type: "Business",
     score: 1,
     name: "Lunch with mum",
@@ -78,6 +84,7 @@ const temp = [
       "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsum, accusantium error dolor atque numquam mollitia sint quae saepe illum deleniti. Asperiores, excepturi pariatur quibusdam vitae nesciunt quia. Aliquid, voluptatem! Dignissimos?",
   },
   {
+    id: 7,
     type: "Business",
     score: 6,
     name: "Gaming with the boys",
@@ -89,6 +96,7 @@ const temp = [
       "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsum, accusantium error dolor atque numquam mollitia sint quae saepe illum deleniti. Asperiores, excepturi pariatur quibusdam vitae nesciunt quia. Aliquid, voluptatem! Dignissimos?",
   },
   {
+    id: 8,
     type: "Business",
     score: 2,
     name: "Shopping",
