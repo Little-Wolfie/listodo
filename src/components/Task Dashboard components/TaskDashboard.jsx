@@ -5,9 +5,12 @@ import { useNavigate } from "react-router-dom";
 import "../../css/TaskDashboard.css";
 import Map from "./Map";
 import "react-datepicker/dist/react-datepicker.css";
-import { doc, setDoc, getDoc, query, where, collection, Timestamp, getDocs, updateDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, query, where, collection, Timestamp, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
 import { db, auth } from  "../../firebase/firebase"
 import { onAuthStateChanged } from "firebase/auth";
+import { useSwipeable } from 'react-swipeable';
+import SwipeableAccordionItem from './SwipeableAccordionItem';
+
 
 const MAP_REFRESH = {
   min: 0.0000001,
@@ -90,6 +93,7 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
     });
   }
 
+
   const orderTasks = () => {
     setCurrentOrder(current => !current);
     setTasks(current => {
@@ -117,6 +121,18 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
         lat: task.location.lat + (Math.random() * (MAP_REFRESH.max - MAP_REFRESH.min) + MAP_REFRESH.min) 
       })
   }
+
+  const handleTaskDelete = async (taskId) => {
+	setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId))
+	try {
+		const taskRef = doc(db, currentUser, taskId.toString())
+		await deleteDoc(taskRef)
+	} catch (error) {
+		console.error("Error deleteing task:", error)
+	}
+  }
+
+  
 
   useEffect(() => {
     sortTasks(options[currentOptionIndex].value);
@@ -204,12 +220,14 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
         onSelect={(selectedKey) => setActiveKey((prevKey) => prevKey === selectedKey ? null : selectedKey)}>
 
 					{tasks.map((task, i) => {
+
 						return (
+							<SwipeableAccordionItem taskId={task.id} handleTaskDelete={handleTaskDelete} key={i}>
 							<Accordion.Item
 								eventKey={task.id.toString()}
 								key={i}
-                id={`accordion-item-${task.id}`}
-							>
+								id={`accordion-item-${task.id}`}
+								>
 								<Accordion.Header>
 									<div className='card-left'>
 										<h2>{task.score}</h2>
@@ -227,33 +245,34 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 										type='time'
 										value={task.time}
 										onChange={e => handleTimeDateChange(i, e.target.value, 'time')}
-									/>
+										/>
 									<input
 										type='date'
 										value={task.date}
 										onChange={e => handleTimeDateChange(i, e.target.value, 'date')}
-									/>
+										/>
 									{editableIndex === i ? (
 										<textarea
-											style={{ height: '180px', width: '300px' }}
-											type='text'
-											defaultValue={task.description}
-											onChange={(e) => setEditText(e.target.value)}
+										style={{ height: '180px', width: '300px' }}
+										type='text'
+										defaultValue={task.description}
+										onChange={(e) => setEditText(e.target.value)}
 										/>
-									) : (
-										task.description
-									)}
+										) : (
+											task.description
+											)}
 									{editableIndex === i ? (
 										<button onClick={() => handleSaveClick(i)}>Save</button>
-									) : (
-										<button onClick={() => setEditableIndex(i)}>Edit</button>
-									)}
+										) : (
+											<button onClick={() => setEditableIndex(i)}>Edit</button>
+											)}
 									<button onClick={() => flyToTask(task)}>
 										Show On Map
 									</button>
 									<button onClick={() => handleCompletedTask(task)}>Completed</button>
 								</Accordion.Body>
 							</Accordion.Item>
+							</SwipeableAccordionItem>
 						);
 					})}
 				</Accordion>
