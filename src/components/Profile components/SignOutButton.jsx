@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/firebase";
+import { Button} from 'react-bootstrap';
 
 const SignOutButton = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const SignOutButton = () => {
   return (
     <div>
       {error && <p>{error}</p>}
-      <button onClick={handleSignOutClick}>Sign Out</button>
+      <Button variant="danger" className="mb-3"  onClick={handleSignOutClick}>Sign Out</Button>
     </div>
   );
 };
