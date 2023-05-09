@@ -2,60 +2,106 @@ import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '../../css/TaskDashboard.css';
-import '../../css/TaskDashboard.css';
 
 const MARKER_COLORS = {
-	Task: 'red',
-	Appointment: 'blue',
-	Meeting: 'green',
-	Business: 'yellow',
-	Personal: 'pink',
-	Job: 'orange',
+	Task: '#ffdc00',
+	Appointment: '#9e00ff',
+	Meeting: '#00ff15',
+	Business: '#e0ff00',
+	Personal: '#ff0000',
+	Job: '0021ff',
 };
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
-const Map = ({ center, tasks, map, setActiveKey }) => {
-	const [markers, setMarkers] = useState([]);
+const Map = ({ center, tasks, map, setActiveKey, setMarkers }) => {
 	const mapContainerRef = useRef(null);
 
+  const generateColorFilter = (color) => {
+    const dummyElement = document.createElement("div");
+    dummyElement.style.color = color;
+    document.body.appendChild(dummyElement);
+    const rgbColor = window.getComputedStyle(dummyElement).color;
+    document.body.removeChild(dummyElement);
+
+    const rgbToHsl = (r, g, b) => {
+      r /= 255;
+      g /= 255;
+      b /= 255;
+
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+
+      if (max === min) {
+        h = s = 0;
+      } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+          default: break;
+        }
+
+        h /= 6;
+      }
+
+      return [h, s, l];
+    };
+
+    const sepia = 1;
+    const saturation = 10000;
+    const [r, g, b] = rgbColor.match(/\d+/g).map(Number);
+    const [h, s, l] = rgbToHsl(r, g, b);
+    const hueRotate = (h * 360) - 60; // Shift hue 60 degrees back for white
+
+    return `brightness(1) sepia(${sepia}) saturate(${saturation}%) hue-rotate(${hueRotate}deg)`;
+  };
+
 	const createMarkers = () => {
-  const sortedTask = tasks.slice().sort((a, b) => b.score - a.score)[0];
+    const sortedTask = tasks.slice().sort((a, b) => b.score - a.score)[0];
 
-  return tasks.map((task) => {
-    const isSortedTask =
-      JSON.stringify(task) === JSON.stringify(sortedTask);
+    return tasks.map((task) => {
+      const isSortedTask =
+        JSON.stringify(task) === JSON.stringify(sortedTask);
 
-    const m = new mapboxgl.Marker({ color: MARKER_COLORS[task.type] })
-      .setLngLat([task.location.lng, task.location.lat])
-      .addTo(map.current);
+      const markerElement = document.createElement("div");
+      markerElement.marker_ID = task.id;
+      markerElement.innerHTML = `<img id=marker-${task.id} src="marker.png" style="width: 2rem; height: 2rem; filter: ${generateColorFilter(MARKER_COLORS[task.type])};"/>`;
+      markerElement.style.cursor = "pointer";
 
-    const popup = new mapboxgl.Popup({ offset: 35 }).setHTML(
-      `
-        <div class="popup-content">
-          <h6><strong>${task.name}</strong></h6>
-          <p>${task.time}</p>
-          <p>${task.date}</p>
-        </div>
-      `
-    );
+      const m = new mapboxgl.Marker(markerElement)
+        .setLngLat([task.location.lng, task.location.lat])
+        .addTo(map.current);
 
-    m.setPopup(popup);
+      const popup = new mapboxgl.Popup({ offset: 35 }).setHTML(
+        `
+          <div class="popup-content">
+            <h6><strong>${task.name}</strong></h6>
+            <p>${task.type}</p>
+            <p>${task.time}</p>
+            <p>${task.date}</p>
+          </div>
+        `
+      );
 
-    m.getElement().addEventListener('click', () => {
-      setActiveKey(task.id.toString());
-      map.current.flyTo({ center: [task.location.lng, task.location.lat], zoom: 14 });
+      m.setPopup(popup);
+
+      m.getElement().addEventListener('click', () => {
+        setActiveKey(task.id.toString());
+        map.current.flyTo({ center: [task.location.lng, task.location.lat], zoom: 14 });
+      });
+
+      if (isSortedTask) {
+        m.togglePopup(); 
+      }
+
+      return m;
     });
-
-    if (isSortedTask) {
-      m.togglePopup(); 
-    }
-
-    
-
-    return m;
-  });
-};
+  };
 
 	useEffect(() => {
     if (map.current) return; // Avoid reinitializing the map
@@ -83,8 +129,6 @@ const Map = ({ center, tasks, map, setActiveKey }) => {
       setMarkers(newMarkers);
     };
 
-    
-
     navigator.geolocation.getCurrentPosition(
       (position) => {
         initializeMap(position.coords);
@@ -101,8 +145,6 @@ const Map = ({ center, tasks, map, setActiveKey }) => {
       }
     };
   }, [map]);
-
-
 
 	useEffect(() => {
 		if (map.current && tasks.length > 0) {
