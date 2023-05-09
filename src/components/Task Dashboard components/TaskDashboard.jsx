@@ -6,13 +6,28 @@ import "../../css/TaskDashboard.css";
 import Map from "./Map";
 import "react-datepicker/dist/react-datepicker.css";
 
+const MAP_REFRESH = {
+  min: 0.0000001,
+  max: 0.000001
+}
+
+const options = [
+  { label: 'Score', value: 'score'},
+  { label: 'Name', value: 'name'},
+  { label: 'Time', value: 'time'},
+  { label: 'Duration', value: 'duration'},
+  { label: 'Type', value: 'type'},
+]
+
 export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 	const navigate = useNavigate();
 	const [editableIndex, setEditableIndex] = useState(null);
 	const [editText, setEditText] = useState('');
 	const [center, setCenter] = useState({ lng: -0.4, lat: 51 });
   const [activeKey, setActiveKey] = useState(null);
-  const orderRef = useRef(null);
+	const [markers, setMarkers] = useState([]);
+  const [currentOptionIndex, setCurrentOptionIndex] = useState(0);
+  const [currentOrder, setCurrentOrder] = useState(false)
 
 	const handleSaveClick = i => {
 		setTaskUtil(i, 'description', editText);
@@ -33,6 +48,10 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 		);
   }
 
+  const handleButtonClick = () => {
+    setCurrentOptionIndex((prevIndex) => (prevIndex + 1) % options.length);
+  };
+
   const sortTasks = (sort) => {
     setTasks(current => {
       const sortedTasks = current
@@ -49,24 +68,51 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
           }
         });
 
-      if (orderRef.current) orderRef.current.value = 'desc'
+      flyToTask(sortedTasks[0])
       return sortedTasks;
     });
   }
 
   const orderTasks = () => {
+    setCurrentOrder(current => !current);
     setTasks(current => {
       const orderedTasks = current
         .slice()
         .reverse();
       
+        flyToTask(orderedTasks[0])
       return orderedTasks;
     })
   }
 
-	useEffect(() => {
-		sortTasks('score');
-	}, []);
+  const flyToTask = (task) => {
+    setCenter(
+      { 
+        lng: task.location.lng + (Math.random() * (MAP_REFRESH.max - MAP_REFRESH.min) + MAP_REFRESH.min), 
+        lat: task.location.lat + (Math.random() * (MAP_REFRESH.max - MAP_REFRESH.min) + MAP_REFRESH.min) 
+      })
+  }
+
+  useEffect(() => {
+    sortTasks(options[currentOptionIndex].value);
+  }, [currentOptionIndex])
+
+  useEffect(() => {
+    const selectedTask = tasks.filter(task => task.id === Number(activeKey));
+    if (selectedTask[0]) flyToTask(selectedTask[0])
+
+    const selectedMarker = markers.filter(marker => marker.getElement().marker_ID === Number(activeKey))
+    if (selectedMarker[0]) {
+      markers.forEach(marker => {
+        if (marker.getPopup().isOpen()) {
+
+          marker.togglePopup();
+        }
+      })
+      selectedMarker[0].togglePopup()
+    };
+
+  }, [activeKey])
 
 	return (
 		<div className='task-dashboard'>
@@ -90,21 +136,24 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 			</header>
 
 			<div className='filtering-container'>
-        <p>Sort</p>
-				<select onChange={e => sortTasks(e.target.value)}>
-					<option value='score'>Score</option>
-          <option value='name'>Name</option>
-          <option value='time'>Time/Date</option>
-          <option value='duration'>Duration</option>
-          <option value='type'>Type</option>
-				</select>
+        <div>
+          <button onClick={handleButtonClick}>
+            {options[currentOptionIndex].label}
+          </button>
+        </div>
 
-        <p>Order</p>
-        <select onChange={() => orderTasks()} ref={orderRef}>
-					<option value='desc'>Desc</option>
-          <option value='asc'>Asc</option>
-				</select>
-				<button onClick={() => sortTasks('score')}>Auto</button>
+        <div>
+          <button onClick={orderTasks}>
+            {currentOrder ? 'Asc' : 'Desc'}
+          </button>
+        </div>
+
+				<button onClick={() => {
+          setCurrentOptionIndex(0)
+          if (currentOrder) orderTasks();
+        }}>
+          Reset
+        </button>
 			</div>
 
 			<p className='info-small'>
@@ -112,7 +161,8 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 			</p>
 
 			<div className='list-container'>
-				<Accordion activeKey={activeKey} onSelect={(selectedKey) => setActiveKey((prevKey) => prevKey === selectedKey ? null : selectedKey)}>
+				<Accordion activeKey={activeKey} 
+        onSelect={(selectedKey) => setActiveKey((prevKey) => prevKey === selectedKey ? null : selectedKey)}>
 
 					{tasks.map((task, i) => {
 						return (
@@ -159,7 +209,7 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 									) : (
 										<button onClick={() => setEditableIndex(i)}>Edit</button>
 									)}
-									<button onClick={() => setCenter(task.location)}>
+									<button onClick={() => flyToTask(task)}>
 										Show On Map
 									</button>
 									<button>Completed</button>
@@ -173,9 +223,10 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 			<div className='map-wrapper'>
 				<Map
 					center={center}
-					locations={tasks}
+					tasks={tasks}
 					map={map}
           setActiveKey={setActiveKey}
+          setMarkers={setMarkers}
 				/>
 			</div>
 		</div>

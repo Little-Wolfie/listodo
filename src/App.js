@@ -13,7 +13,7 @@ import { useRef, useState } from "react";
 const temp = [
   {
     id: 1,
-    type: "Business",
+    type: "Task",
     score: 3,
     name: "Eat Pizza",
     date: "2023-08-16",
@@ -73,7 +73,7 @@ const temp = [
   },
   {
     id: 6,
-    type: "Business",
+    type: "Job",
     score: 1,
     name: "Lunch with mum",
     date: "2023-09-19",
@@ -117,7 +117,7 @@ function App() {
 
   return (
     <div className="App">
-   {location.pathname !== '/login' && <Header />}
+      {location.pathname !== '/login' && <Header />}
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
 
