@@ -78,12 +78,13 @@ const Map = ({ center, tasks, map, setActiveKey, setMarkers }) => {
         .addTo(map.current);
 
       const popup = new mapboxgl.Popup({ offset: 35 }).setHTML(
+
         `
           <div class="popup-content">
             <h6><strong>${task.name}</strong></h6>
             <p>${task.type}</p>
-            <p>${task.time}</p>
-            <p>${task.date}</p>
+            <p>${task.location.name}</p>
+            <p>${task.deadline}</p>
           </div>
         `
       );

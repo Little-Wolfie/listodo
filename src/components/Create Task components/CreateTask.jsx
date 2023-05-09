@@ -3,7 +3,10 @@ import '../../css/CreateTask.css';
 import mapboxgl from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { getFirestore, auth, db } from '../../firebase/firebase';
+import { doc, setDoc, collection, Timestamp } from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
 
 export const CreateTask = ({ map, setTasks }) => {
 	const navigate = useNavigate();
@@ -20,31 +23,50 @@ export const CreateTask = ({ map, setTasks }) => {
 	const [location, setLocation] = useState({ name: '', lng: 0, lat: 0 });
 
 	const locationInput = useRef(null);
+	 const addTask = useLocation().state?.addTask;
 
-	const handleCreateTaskSubmit = e => {
+
+	const handleCreateTaskSubmit = async (e) => {
 		e.preventDefault();
-
+		const dueDateTimeString = `${dueDate}T${dueTime}`;
+		const dueDateTime = new Date(dueDateTimeString);
+		const dueDateTimestamp = Timestamp.fromDate(dueDateTime);
 		const task = {
-      id: Math.random() * 10,
-			type: type,
+			id: uuidv4(),
+			deadline: dueDateTimestamp,
+			description: taskDescription,
+			duration: taskDuration,
+			location: location,
+			name: taskTitle,
 			// need to deal with scoring
 			//score = (urgency_weight * urgency + importance_weight * importance) / (duration_weight * duration)
 			score: Number(taskUrgency) + Number(taskImportance),
-			name: taskTitle,
-			date: dueDate,
-			time: dueTime,
-			location: location,
-			description: taskDescription,
+			type: type,
+			userId: auth.currentUser.uid,
+			completed: false
 		};
+		console.log(task.deadline)
 
+		try {
+			const userDocRef = doc(db, 'tasks', `${task.userId}-tasks`)
+			const tasksCollectionRef = collection(userDocRef, 'tasks')
+			await setDoc(doc(tasksCollectionRef, task.name), task);
+			addTask(task);
+			navigate('/dashboard');
+		} catch (error) {
+			console.error('Error adding task to Firestore:', error);
+		}
+		
 		setTasks(current => {
 			const newTasks = [task, ...current];
 			console.log('newTasks:', newTasks);
 			return newTasks;
 		});
-
+		
 		navigate('/dashboard');
 	};
+
+
 
 	useEffect(() => {
 		if (map) {
@@ -167,4 +189,4 @@ export const CreateTask = ({ map, setTasks }) => {
 			</div>
 		</div>
 	);
-};
+}

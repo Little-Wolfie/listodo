@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import "../../css/TaskDashboard.css";
 import Map from "./Map";
 import "react-datepicker/dist/react-datepicker.css";
+import { doc, setDoc, getDoc, query, where, collection, Timestamp } from "firebase/firestore";
+import { db, auth } from  "../../firebase/firebase"
 
 const MAP_REFRESH = {
   min: 0.0000001,
@@ -47,6 +49,20 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
       })
 		);
   }
+
+  const fetchTasksFromDB = async () => {
+    try {
+      const tasksSnapshot = await db.collection("tasks", auth.currentUser.uid).get()
+      const fetchedTasks = tasksSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      setTasks(fetchTasksFromDB)
+    } catch (error) {
+      console.error("Error fetching tasks from database:", error)
+    }
+  }
+
 
   const handleButtonClick = () => {
     setCurrentOptionIndex((prevIndex) => (prevIndex + 1) % options.length);
@@ -96,6 +112,10 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
   useEffect(() => {
     sortTasks(options[currentOptionIndex].value);
   }, [currentOptionIndex])
+
+  useEffect(() => {
+   fetchTasksFromDB();
+  }, [])
 
   useEffect(() => {
     const selectedTask = tasks.filter(task => task.id === Number(activeKey));
