@@ -25,6 +25,7 @@ export const CreateTask = ({ map, setTasks }) => {
 		e.preventDefault();
 
 		const task = {
+      id: Math.random() * 10,
 			type: type,
 			// need to deal with scoring
 			//score = (urgency_weight * urgency + importance_weight * importance) / (duration_weight * duration)

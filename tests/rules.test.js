@@ -35,21 +35,15 @@ function getAuthedFirestore(auth) {
     .firestore();
 }
 
-// ...
-
 beforeEach(async () => {
-  // Clear the database between tests
   await firebase.clearFirestoreData({ projectId: myProjectID });
 });
 
 beforeAll(async () => {
-  // Corrected from 'before' to 'beforeAll'
-  // Load the rules file before the tests begin
   const rules = fs.readFileSync("firestore.rules", "utf8");
   await loadRules();
 });
 
-// ...
 
 describe("my rules", () => {
   test("users can only post a new task when they're logged in", async () => {
