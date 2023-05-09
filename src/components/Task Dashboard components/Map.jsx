@@ -14,71 +14,90 @@ const MARKER_COLORS = {
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
-const Map = ({ center, tasks, map, setActiveKey, setMarkers }) => {
+const Map = ({
+	center,
+	tasks,
+	map,
+	setActiveKey,
+	markers,
+	setMarkers,
+	sortTasks,
+	closeAllPopups,
+}) => {
 	const mapContainerRef = useRef(null);
 
-  const generateColorFilter = (color) => {
-    const dummyElement = document.createElement("div");
-    dummyElement.style.color = color;
-    document.body.appendChild(dummyElement);
-    const rgbColor = window.getComputedStyle(dummyElement).color;
-    document.body.removeChild(dummyElement);
+	const generateColorFilter = color => {
+		const dummyElement = document.createElement('div');
+		dummyElement.style.color = color;
+		document.body.appendChild(dummyElement);
+		const rgbColor = window.getComputedStyle(dummyElement).color;
+		document.body.removeChild(dummyElement);
 
-    const rgbToHsl = (r, g, b) => {
-      r /= 255;
-      g /= 255;
-      b /= 255;
+		const rgbToHsl = (r, g, b) => {
+			r /= 255;
+			g /= 255;
+			b /= 255;
 
-      const max = Math.max(r, g, b);
-      const min = Math.min(r, g, b);
-      let h, s, l = (max + min) / 2;
+			const max = Math.max(r, g, b);
+			const min = Math.min(r, g, b);
+			let h,
+				s,
+				l = (max + min) / 2;
 
-      if (max === min) {
-        h = s = 0;
-      } else {
-        const d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+			if (max === min) {
+				h = s = 0;
+			} else {
+				const d = max - min;
+				s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
 
-        switch (max) {
-          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-          case g: h = (b - r) / d + 2; break;
-          case b: h = (r - g) / d + 4; break;
-          default: break;
-        }
+				switch (max) {
+					case r:
+						h = (g - b) / d + (g < b ? 6 : 0);
+						break;
+					case g:
+						h = (b - r) / d + 2;
+						break;
+					case b:
+						h = (r - g) / d + 4;
+						break;
+					default:
+						break;
+				}
 
-        h /= 6;
-      }
+				h /= 6;
+			}
 
-      return [h, s, l];
-    };
+			return [h, s, l];
+		};
 
-    const sepia = 1;
-    const saturation = 10000;
-    const [r, g, b] = rgbColor.match(/\d+/g).map(Number);
-    const [h, s, l] = rgbToHsl(r, g, b);
-    const hueRotate = (h * 360) - 60; // Shift hue 60 degrees back for white
+		const sepia = 1;
+		const saturation = 10000;
+		const [r, g, b] = rgbColor.match(/\d+/g).map(Number);
+		const [h, s, l] = rgbToHsl(r, g, b);
+		const hueRotate = h * 360 - 60; // Shift hue 60 degrees back for white
 
-    return `brightness(1) sepia(${sepia}) saturate(${saturation}%) hue-rotate(${hueRotate}deg)`;
-  };
+		return `brightness(1) sepia(${sepia}) saturate(${saturation}%) hue-rotate(${hueRotate}deg)`;
+	};
 
 	const createMarkers = () => {
-    const sortedTask = tasks.slice().sort((a, b) => b.score - a.score)[0];
+		return tasks.map(task => {
+			const isSortedTask = JSON.stringify(task) === JSON.stringify(tasks[0]);
 
-    return tasks.map((task) => {
-      const isSortedTask =
-        JSON.stringify(task) === JSON.stringify(sortedTask);
+			const markerElement = document.createElement('div');
+			markerElement.marker_ID = task.id;
+			markerElement.innerHTML = `<img id=marker-${
+				task.id
+			} src="marker.png" style="width: 2rem; height: 2rem; filter: ${generateColorFilter(
+				MARKER_COLORS[task.type]
+			)};"/>`;
+			markerElement.style.cursor = 'pointer';
 
-      const markerElement = document.createElement("div");
-      markerElement.marker_ID = task.id;
-      markerElement.innerHTML = `<img id=marker-${task.id} src="marker.png" style="width: 2rem; height: 2rem; filter: ${generateColorFilter(MARKER_COLORS[task.type])};"/>`;
-      markerElement.style.cursor = "pointer";
+			const m = new mapboxgl.Marker(markerElement)
+				.setLngLat([task.location.lng, task.location.lat])
+				.addTo(map.current);
 
-      const m = new mapboxgl.Marker(markerElement)
-        .setLngLat([task.location.lng, task.location.lat])
-        .addTo(map.current);
-
-      const popup = new mapboxgl.Popup({ offset: 35 }).setHTML(
-        `
+			const popup = new mapboxgl.Popup({ offset: 35 }).setHTML(
+				`
           <div class="popup-content">
             <h6><strong>${task.name}</strong></h6>
             <p>${task.type}</p>
@@ -86,70 +105,73 @@ const Map = ({ center, tasks, map, setActiveKey, setMarkers }) => {
             <p>${task.date}</p>
           </div>
         `
-      );
+			);
 
-      m.setPopup(popup);
+			m.setPopup(popup);
 
-      m.getElement().addEventListener('click', () => {
-        setActiveKey(task.id.toString());
-        map.current.flyTo({ center: [task.location.lng, task.location.lat], zoom: 14 });
-      });
+			m.getElement().addEventListener('click', () => {
+				setActiveKey(task.id.toString());
+			});
 
-      if (isSortedTask) {
-        m.togglePopup(); 
-      }
+			if (isSortedTask) {
+				m.togglePopup();
+			}
 
-      return m;
-    });
-  };
+			return m;
+		});
+	};
 
 	useEffect(() => {
-    if (map.current) return; // Avoid reinitializing the map
+		if (map.current) return;
 
-    const initializeMap = (coords) => {
-      const { longitude, latitude } = coords;
-      map.current = new mapboxgl.Map({
-        container: mapContainerRef.current,
-        style: 'mapbox://styles/wolfiex/clh7da82l01lm01p4dnoohyo3',
-        center: [longitude, latitude],
-        zoom: 12,
-      });
+		const initializeMap = coords => {
+			const { longitude, latitude } = coords;
+			map.current = new mapboxgl.Map({
+				container: mapContainerRef.current,
+				style: 'mapbox://styles/wolfiex/clh7da82l01lm01p4dnoohyo3',
+				center: [longitude, latitude],
+				zoom: 12,
+			});
 
-      const sortedTasks = tasks
-				.slice()
-				.sort((a, b) => b.score - a.score);
+			const sortedTasks = tasks.slice().sort((a, b) => b.score - a.score);
 
-		  map.current.flyTo({ center: [sortedTasks[0].location.lng, sortedTasks[0].location.lat], zoom: 14 });
+			map.current.flyTo({
+				center: [sortedTasks[0].location.lng, sortedTasks[0].location.lat],
+				zoom: 14,
+			});
 
-      map.current.on('load', () => {
-      // do something on map load later
-      })
+			map.current.on('load', () => {
+				// do something on map load later
+			});
 
-      const newMarkers = createMarkers();
-      setMarkers(newMarkers);
-    };
+			const newMarkers = createMarkers();
+			setMarkers(newMarkers);
+		};
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        initializeMap(position.coords);
-      },
-      () => {
-        initializeMap({ longitude: -0.4, latitude: 51 });
-      }
-    );
+		navigator.geolocation.getCurrentPosition(
+			position => {
+				initializeMap(position.coords);
+			},
+			() => {
+				initializeMap({ longitude: -0.4, latitude: 51 });
+			}
+		);
 
-    return () => {
-      if (map.current) {
-        map.current.remove();
-        map.current = null;
-      }
-    };
-  }, [map]);
+		return () => {
+			if (map.current) {
+				map.current.remove();
+				map.current = null;
+			}
+		};
+	}, [map]);
 
 	useEffect(() => {
 		if (map.current && tasks.length > 0) {
-			const newMarkers = createMarkers();
-			setMarkers(newMarkers);
+			setMarkers(() => {
+				closeAllPopups();
+
+				return createMarkers();
+			});
 		}
 	}, [tasks]);
 

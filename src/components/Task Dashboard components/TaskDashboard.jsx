@@ -1,33 +1,34 @@
 import React, { useEffect, useRef, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Accordion from "react-bootstrap/Accordion";
-import { useNavigate } from "react-router-dom";
-import "../../css/TaskDashboard.css";
-import Map from "./Map";
-import "react-datepicker/dist/react-datepicker.css";
+
+import '../../css/TaskDashboard.css';
+import FilterButtons from './FilterButtons';
+import MapElement from './MapElement';
+import TaskList from './TaskList';
+import NavigationButtons from './NavigationButtons';
 
 const MAP_REFRESH = {
-  min: 0.0000001,
-  max: 0.000001
-}
+	min: 0.0001,
+	max: 0.001,
+};
 
 const options = [
-  { label: 'Score', value: 'score'},
-  { label: 'Name', value: 'name'},
-  { label: 'Time', value: 'time'},
-  { label: 'Duration', value: 'duration'},
-  { label: 'Type', value: 'type'},
-]
+	{ label: 'Score', value: 'score' },
+	{ label: 'Name', value: 'name' },
+	{ label: 'Time', value: 'time' },
+	{ label: 'Duration', value: 'duration' },
+	{ label: 'Type', value: 'type' },
+];
 
 export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
-	const navigate = useNavigate();
 	const [editableIndex, setEditableIndex] = useState(null);
 	const [editText, setEditText] = useState('');
 	const [center, setCenter] = useState({ lng: -0.4, lat: 51 });
-  const [activeKey, setActiveKey] = useState(null);
+	const [activeKey, setActiveKey] = useState(5);
 	const [markers, setMarkers] = useState([]);
-  const [currentOptionIndex, setCurrentOptionIndex] = useState(0);
-  const [currentOrder, setCurrentOrder] = useState(false)
+	const [currentOptionIndex, setCurrentOptionIndex] = useState(0);
+	const [currentOrder, setCurrentOrder] = useState(false);
+	const [timestamp, setTimestamp] = useState(null);
 
 	const handleSaveClick = i => {
 		setTaskUtil(i, 'description', editText);
@@ -39,196 +40,132 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 		setTaskUtil(index, key, value);
 	};
 
-  const setTaskUtil = (index, key, value) => {
-    setTasks(prevTasks =>
+	const setTaskUtil = (index, key, value) => {
+		setTasks(prevTasks =>
 			prevTasks.map((task, i) => {
 				if (i === index) task[key] = value;
-        return task;
-      })
+				return task;
+			})
 		);
-  }
+	};
 
-  const handleButtonClick = () => {
-    setCurrentOptionIndex((prevIndex) => (prevIndex + 1) % options.length);
-  };
+	const handleFilterButtonClick = () => {
+		setCurrentOptionIndex(prevIndex => (prevIndex + 1) % options.length);
+		setCurrentOrder(false);
+	};
 
-  const sortTasks = (sort) => {
-    setTasks(current => {
-      const sortedTasks = current
-        .slice()
-        .sort((a, b) => {
-          if (sort === 'time') {
-            const aDateTime = new Date(`${a.date}T${a.time}`);
-            const bDateTime = new Date(`${b.date}T${b.time}`);
-            return aDateTime - bDateTime;
-          } else if (typeof a[sort] === 'number') {
-            return b[sort] - a[sort];
-          } else {
-            return a[sort].localeCompare(b[sort]);
-          }
-        });
+	const sortTasks = sort => {
+		return tasks.slice().sort((a, b) => {
+			if (sort === 'time') {
+				const aDateTime = new Date(`${a.date}T${a.time}`);
+				const bDateTime = new Date(`${b.date}T${b.time}`);
+				return aDateTime - bDateTime;
+			} else if (typeof a[sort] === 'number') {
+				return b[sort] - a[sort];
+			} else {
+				return a[sort].localeCompare(b[sort]);
+			}
+		});
+	};
 
-      flyToTask(sortedTasks[0])
-      return sortedTasks;
-    });
-  }
+	const orderTasks = () => {
+		setCurrentOrder(current => !current);
+		setTasks(current => {
+			const orderedTasks = current.slice().reverse();
 
-  const orderTasks = () => {
-    setCurrentOrder(current => !current);
-    setTasks(current => {
-      const orderedTasks = current
-        .slice()
-        .reverse();
-      
-        flyToTask(orderedTasks[0])
-      return orderedTasks;
-    })
-  }
+			setActiveKey(orderedTasks[0].id.toString());
+			setTimestamp(Date.now());
+			return orderedTasks;
+		});
+	};
 
-  const flyToTask = (task) => {
-    setCenter(
-      { 
-        lng: task.location.lng + (Math.random() * (MAP_REFRESH.max - MAP_REFRESH.min) + MAP_REFRESH.min), 
-        lat: task.location.lat + (Math.random() * (MAP_REFRESH.max - MAP_REFRESH.min) + MAP_REFRESH.min) 
-      })
-  }
+	const flyToTask = task => {
+		setCenter({
+			lng: (
+				task.location.lng +
+				(Math.random() * (MAP_REFRESH.max - MAP_REFRESH.min) + MAP_REFRESH.min)
+			).toFixed(4),
+			lat: (
+				task.location.lat +
+				(Math.random() * (MAP_REFRESH.max - MAP_REFRESH.min) + MAP_REFRESH.min)
+			).toFixed(4),
+		});
+	};
 
-  useEffect(() => {
-    sortTasks(options[currentOptionIndex].value);
-  }, [currentOptionIndex])
+	const closeAllPopups = () => {
+		markers.forEach(marker => {
+			if (marker.getPopup().isOpen()) {
+				console.log('Close Popups Called!');
+				marker.togglePopup();
+			}
+		});
+	};
 
-  useEffect(() => {
-    const selectedTask = tasks.filter(task => task.id === Number(activeKey));
-    if (selectedTask[0]) flyToTask(selectedTask[0])
+	useEffect(() => {
+		setTasks(() => {
+			const sorted = sortTasks(options[currentOptionIndex].value);
+			setActiveKey(sorted[0].id.toString());
+			setTimestamp(Date.now());
+			return sorted;
+		});
+	}, [currentOptionIndex]);
 
-    const selectedMarker = markers.filter(marker => marker.getElement().marker_ID === Number(activeKey))
-    if (selectedMarker[0]) {
-      markers.forEach(marker => {
-        if (marker.getPopup().isOpen()) {
+	useEffect(() => {
+		const selectedTask = tasks.filter(task => task.id === Number(activeKey));
+		if (selectedTask[0]) flyToTask(selectedTask[0]);
 
-          marker.togglePopup();
-        }
-      })
-      selectedMarker[0].togglePopup()
-    };
+		const selectedMarker = markers.filter(
+			marker => marker.getElement().marker_ID === Number(activeKey)
+		);
 
-  }, [activeKey])
+		if (selectedMarker[0]) {
+			console.log('popup toggled!');
+			selectedMarker[0].togglePopup();
+		}
+	}, [activeKey, timestamp]);
 
 	return (
 		<div className='task-dashboard'>
-			<header>
-				<div className='header-container'>
-					<button
-						onClick={() => {
-							navigate('/create-task');
-						}}
-					>
-						Create Task
-					</button>
-					<button
-						onClick={() => {
-							navigate('/profile');
-						}}
-					>
-						Profile
-					</button>
-				</div>
-			</header>
+			<NavigationButtons />
 
-			<div className='filtering-container'>
-        <div>
-          <button onClick={handleButtonClick}>
-            {options[currentOptionIndex].label}
-          </button>
-        </div>
+			<button onClick={() => closeAllPopups()}>close</button>
 
-        <div>
-          <button onClick={orderTasks}>
-            {currentOrder ? 'Asc' : 'Desc'}
-          </button>
-        </div>
-
-				<button onClick={() => {
-          setCurrentOptionIndex(0)
-          if (currentOrder) orderTasks();
-        }}>
-          Reset
-        </button>
-			</div>
+			<FilterButtons
+				options={options}
+				currentOptionIndex={currentOptionIndex}
+				currentOrder={currentOrder}
+				orderTasks={orderTasks}
+				setCurrentOptionIndex={setCurrentOptionIndex}
+				handleFilterButtonClick={handleFilterButtonClick}
+			/>
 
 			<p className='info-small'>
 				<em>Slide to the left to delete an item</em>
 			</p>
 
-			<div className='list-container'>
-				<Accordion activeKey={activeKey} 
-        onSelect={(selectedKey) => setActiveKey((prevKey) => prevKey === selectedKey ? null : selectedKey)}>
+			<TaskList
+				activeKey={activeKey}
+				setActiveKey={setActiveKey}
+				tasks={tasks}
+				handleTimeDateChange={handleTimeDateChange}
+				setEditText={setEditText}
+				editableIndex={editableIndex}
+				handleSaveClick={handleSaveClick}
+				setEditableIndex={setEditableIndex}
+				flyToTask={flyToTask}
+				closeAllPopups={closeAllPopups}
+			/>
 
-					{tasks.map((task, i) => {
-						return (
-							<Accordion.Item
-								eventKey={task.id.toString()}
-								key={i}
-                id={`accordion-item-${task.id}`}
-							>
-								<Accordion.Header>
-									<div className='card-left'>
-										<h2>{task.score}</h2>
-									</div>
-									<div className='card-right'>
-										<h2>{task.name}</h2>
-									</div>
-								</Accordion.Header>
-
-								<Accordion.Body>
-									<p>
-										<em>{task.type}</em>
-									</p>
-									<input
-										type='time'
-										value={task.time}
-										onChange={e => handleTimeDateChange(i, e.target.value, 'time')}
-									/>
-									<input
-										type='date'
-										value={task.date}
-										onChange={e => handleTimeDateChange(i, e.target.value, 'date')}
-									/>
-									{editableIndex === i ? (
-										<textarea
-											style={{ height: '180px', width: '300px' }}
-											type='text'
-											defaultValue={task.description}
-											onChange={(e) => setEditText(e.target.value)}
-										/>
-									) : (
-										task.description
-									)}
-									{editableIndex === i ? (
-										<button onClick={() => handleSaveClick(i)}>Save</button>
-									) : (
-										<button onClick={() => setEditableIndex(i)}>Edit</button>
-									)}
-									<button onClick={() => flyToTask(task)}>
-										Show On Map
-									</button>
-									<button>Completed</button>
-								</Accordion.Body>
-							</Accordion.Item>
-						);
-					})}
-				</Accordion>
-			</div>
-
-			<div className='map-wrapper'>
-				<Map
-					center={center}
-					tasks={tasks}
-					map={map}
-          setActiveKey={setActiveKey}
-          setMarkers={setMarkers}
-				/>
-			</div>
+			<MapElement
+				center={center}
+				tasks={tasks}
+				map={map}
+				setActiveKey={setActiveKey}
+				markers={markers}
+				setMarkers={setMarkers}
+				sortTasks={sortTasks}
+				closeAllPopups={closeAllPopups}
+			/>
 		</div>
 	);
 };
