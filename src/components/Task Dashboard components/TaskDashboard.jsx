@@ -5,8 +5,9 @@ import { useNavigate } from "react-router-dom";
 import "../../css/TaskDashboard.css";
 import Map from "./Map";
 import "react-datepicker/dist/react-datepicker.css";
-import { doc, setDoc, getDoc, query, where, collection, Timestamp } from "firebase/firestore";
+import { doc, setDoc, getDoc, query, where, collection, Timestamp, getDocs, updateDoc } from "firebase/firestore";
 import { db, auth } from  "../../firebase/firebase"
+import { onAuthStateChanged } from "firebase/auth";
 
 const MAP_REFRESH = {
   min: 0.0000001,
@@ -26,10 +27,11 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 	const [editableIndex, setEditableIndex] = useState(null);
 	const [editText, setEditText] = useState('');
 	const [center, setCenter] = useState({ lng: -0.4, lat: 51 });
-  const [activeKey, setActiveKey] = useState(null);
+  	const [activeKey, setActiveKey] = useState(null);
 	const [markers, setMarkers] = useState([]);
-  const [currentOptionIndex, setCurrentOptionIndex] = useState(0);
-  const [currentOrder, setCurrentOrder] = useState(false)
+  	const [currentOptionIndex, setCurrentOptionIndex] = useState(0);
+  	const [currentOrder, setCurrentOrder] = useState(false)
+	const [currentUser, setCurrentUser] = useState("")
 
 	const handleSaveClick = i => {
 		setTaskUtil(i, 'description', editText);
@@ -52,17 +54,16 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 
   const fetchTasksFromDB = async () => {
     try {
-      const tasksSnapshot = await db.collection("tasks", auth.currentUser.uid).get()
-      const fetchedTasks = tasksSnapshot.docs.map((doc) => ({
+	const retrievedDocuments = await getDocs(collection(db, currentUser))
+    const fetchedTasks = retrievedDocuments.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }))
-      setTasks(fetchTasksFromDB)
+      setTasks(fetchedTasks)
     } catch (error) {
       console.error("Error fetching tasks from database:", error)
     }
   }
-
 
   const handleButtonClick = () => {
     setCurrentOptionIndex((prevIndex) => (prevIndex + 1) % options.length);
@@ -101,6 +102,10 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
     })
   }
 
+  const handleCompletedTask = (e) => {
+	
+  }
+
   const flyToTask = (task) => {
     setCenter(
       { 
@@ -114,8 +119,18 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
   }, [currentOptionIndex])
 
   useEffect(() => {
-   fetchTasksFromDB();
-  }, [])
+	const getUserDetails = () => {
+		onAuthStateChanged(auth, (userAuth) => {
+		  if (userAuth) {
+			setCurrentUser(userAuth.uid)
+		  }
+		});
+	  };
+	getUserDetails()
+	if(currentUser !== ""){
+		fetchTasksFromDB();
+	}
+  }, [currentUser])
 
   useEffect(() => {
     const selectedTask = tasks.filter(task => task.id === Number(activeKey));
@@ -232,7 +247,7 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 									<button onClick={() => flyToTask(task)}>
 										Show On Map
 									</button>
-									<button>Completed</button>
+									<button onClick={() => handleCompletedTask()}>Completed</button>
 								</Accordion.Body>
 							</Accordion.Item>
 						);
