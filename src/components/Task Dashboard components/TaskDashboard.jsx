@@ -102,8 +102,12 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
     })
   }
 
-  const handleCompletedTask = (e) => {
-	
+  const handleCompletedTask = async (task) => {
+
+	const taskRef = doc(db, currentUser, task.name)
+	await updateDoc(taskRef, {
+		completed: true
+	})
   }
 
   const flyToTask = (task) => {
@@ -247,7 +251,7 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 									<button onClick={() => flyToTask(task)}>
 										Show On Map
 									</button>
-									<button onClick={() => handleCompletedTask()}>Completed</button>
+									<button onClick={() => handleCompletedTask(task)}>Completed</button>
 								</Accordion.Body>
 							</Accordion.Item>
 						);

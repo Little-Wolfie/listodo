@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { db, auth } from "../../firebase/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
 const CompletedTasks = ({setShowCompletedTaskButton, setRenderCompletedTask}) => {
@@ -11,8 +11,9 @@ const CompletedTasks = ({setShowCompletedTaskButton, setRenderCompletedTask}) =>
 
   const fetchTasksFromDB = async () => {
     try {
-	const retrievedDocuments = await getDocs(collection(db, currentUser))
-      const fetchedTasks = retrievedDocuments.docs.map((doc) => ({
+      const collectionQuery =  query(collection(db, currentUser), where("completed", "==", true ))
+      const completedTasks = await getDocs(collectionQuery)
+      const fetchedTasks = completedTasks.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }))
