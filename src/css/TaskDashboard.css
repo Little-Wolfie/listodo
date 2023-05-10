@@ -1,5 +1,5 @@
 body {
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 
 /* HEADER */
@@ -90,7 +90,7 @@ body {
 /* MAP */
 .map-wrapper {
   background-color: purple;
-  height: 100rem;
+  height: 40rem;
   width: 100vw;
   margin: 1rem auto;
   padding-top: 2rem;
