@@ -100,8 +100,7 @@ const Map = ({
 				`
           <div class="popup-content">
             <h6><strong>${task.name}</strong></h6>
-            <p>${task.type}</p>
-            <p>${task.time}</p>
+            <p>${task.name}</p>
             <p>${task.date}</p>
           </div>
         `

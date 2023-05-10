@@ -39,6 +39,7 @@ export const LandingPage = () => {
               Existing User
             </Button>
           )}
+          
           {signInPopup && <SignIn />}
           {showOr && 
             <div className="or-container d-flex align-items-center justify-content-center my-4">
@@ -57,6 +58,7 @@ export const LandingPage = () => {
               Register
             </Button>
           )}
+          
         </div>
       </div>
     </main>

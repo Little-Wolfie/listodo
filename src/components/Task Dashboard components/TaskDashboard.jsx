@@ -1,11 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-
 import '../../css/TaskDashboard.css';
 import FilterButtons from './FilterButtons';
 import MapElement from './MapElement';
 import TaskList from './TaskList';
 import NavigationButtons from './NavigationButtons';
+import { useNavigate } from "react-router-dom";
+import "../../css/TaskDashboard.css";
+import Map from "./Map";
+import "react-datepicker/dist/react-datepicker.css";
+import { doc, setDoc, getDoc, query, where, collection, Timestamp, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
+import { db, auth } from  "../../firebase/firebase"
+import { onAuthStateChanged } from "firebase/auth";
+import { useSwipeable } from 'react-swipeable';
+import SwipeableAccordionItem from './SwipeableAccordionItem';
 
 const MAP_REFRESH = {
 	min: 0.0001,
@@ -29,6 +37,7 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 	const [currentOptionIndex, setCurrentOptionIndex] = useState(0);
 	const [currentOrder, setCurrentOrder] = useState(false);
 	const [timestamp, setTimestamp] = useState(null);
+	const [currentUser, setCurrentUser] = useState("")
 
 	const handleSaveClick = i => {
 		setTaskUtil(i, 'description', editText);
@@ -123,6 +132,58 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 			selectedMarker[0].togglePopup();
 		}
 	}, [activeKey, timestamp]);
+  }
+
+  const fetchTasksFromDB = async () => {
+    try {
+	const retrievedDocuments = await getDocs(collection(db, currentUser))
+    const fetchedTasks = retrievedDocuments.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      setTasks(fetchedTasks)
+    } catch (error) {
+      console.error("Error fetching tasks from database:", error)
+    }
+  }
+
+  const handleCompletedTask = async (task) => {
+
+	const taskRef = doc(db, currentUser, task.name)
+	await updateDoc(taskRef, {
+		completed: true
+	})
+  }
+
+
+
+  const handleTaskDelete = async (taskId) => {
+	setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId))
+	try {
+		const taskRef = doc(db, currentUser, taskId.toString())
+		await deleteDoc(taskRef)
+	} catch (error) {
+		console.error("Error deleteing task:", error)
+	}
+  }
+
+  useEffect(() => {
+    sortTasks(options[currentOptionIndex].value);
+  }, [currentOptionIndex])
+
+  useEffect(() => {
+	const getUserDetails = () => {
+		onAuthStateChanged(auth, (userAuth) => {
+		  if (userAuth) {
+			setCurrentUser(userAuth.uid)
+		  }
+		});
+	  };
+	getUserDetails()
+	if(currentUser !== ""){
+		fetchTasksFromDB();
+	}
+  }, [currentUser])
 
 	return (
 		<div className='task-dashboard'>
@@ -166,6 +227,7 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 				sortTasks={sortTasks}
 				closeAllPopups={closeAllPopups}
 			/>
+
 		</div>
 	);
 };

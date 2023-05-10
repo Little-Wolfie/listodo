@@ -8,8 +8,7 @@ import { TaskDashboard } from "./components/Task Dashboard components/TaskDashbo
 import { CreateTask } from "./components/Create Task components/CreateTask";
 import { EditTask } from "./components/Edit Task components/EditTask";
 import { Profile } from "./components/Profile components/Profile";
-import { useRef, useState } from "react";
-
+import { useRef, useState, useEffect } from "react";
 const temp = [
   {
     id: 1,
@@ -108,41 +107,71 @@ const temp = [
       "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsum, accusantium error dolor atque numquam mollitia sint quae saepe illum deleniti. Asperiores, excepturi pariatur quibusdam vitae nesciunt quia. Aliquid, voluptatem! Dignissimos?",
   },
 ];
-
 function App() {
   const [tasks, setTasks] = useState(temp);
   const map = useRef(null);
-  const location = useLocation()
+  const location = useLocation();
+  const [user, setUser] = useState(null);
   
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+            
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   return (
     <div className="App">
-      {location.pathname !== '/login' && <Header />}
+      {location.pathname !== "/login" && <Header />}
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
-
-        <Route path="/login" element={<LandingPage />} />
-
+        <Route
+          path="/login"
+          element={user ? <Navigate to="/dashboard" replace /> :<LandingPage />}
+        />
         <Route
           path="/dashboard"
           element={
-            <TaskDashboard map={map} tasks={tasks} setTasks={setTasks} />
+            user ? (
+              <TaskDashboard map={map} tasks={tasks} setTasks={setTasks} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
           }
         />
-
         <Route
           path="/create-task"
-          element={<CreateTask map={map} setTasks={setTasks} />}
+          element={
+            user ? (
+              <CreateTask map={map} setTasks={setTasks} />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
         />
-
-        <Route path="/edit-task" element={<EditTask />} />
-
-        <Route path="/profile" element={<Profile />} />
-
+        <Route
+          path="/edit-task"
+          element={user ? <EditTask /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/profile"
+          element={user ? <Profile /> : <Navigate to="/login" replace />}
+        />
         <Route path="*" element={<Navigate to="/login" replace />} />
+        
       </Routes>
     </div>
   );
 }
 
+
 export default App;
+
+
