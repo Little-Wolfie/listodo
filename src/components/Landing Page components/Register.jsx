@@ -5,7 +5,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth"
 import { Form, Button, InputGroup, FormControl } from "react-bootstrap";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 
-export const Register = () => {
+export const Register = ({setRegPopup, setShowExistingUserButton, setShowRegisterButton, setShowOr}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
@@ -24,6 +24,14 @@ export const Register = () => {
     await createUserWithEmailAndPassword(auth, email, password);
     navigate("/dashboard");
   };
+
+  const handleLandingPageReturn = () => {
+    setRegPopup(false)
+    setShowRegisterButton(true)
+    setShowExistingUserButton(true)
+    setShowOr(true)
+  }
+
   return (
     <Form>
       <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -56,9 +64,13 @@ export const Register = () => {
         </InputGroup>
       </Form.Group>
       {error && <p>Email or Password invalid</p>}
-      <Button variant="primary" size="lg" onClick={createAccount}>
-        Create Account
-      </Button>
+      <div className="button-container">
+        <Button onClick={handleLandingPageReturn}>Return</Button>
+        <Button variant="primary" size="s" onClick={createAccount}>
+          Create Account
+        </Button>
+
+      </div>
     </Form>
   );
 };

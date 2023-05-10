@@ -1,13 +1,36 @@
 import React from "react";
 import { Link} from "react-router-dom";
 import "../../css/HeaderLogo.css";
+import { useNavigate } from 'react-router-dom';
+
 const Header = () => {
+  const navigate = useNavigate();
   return (
-    <Link to='/dashboard' className="header-link">
-      <header className="page-title">
-        <h1 className="header-logo">Logo</h1>
-      </header>
-    </Link>
+    <header>
+      <nav>
+        <div className='header-container'>
+          <button
+            onClick={() => {
+              navigate('/create-task');
+            }}
+          >
+            Create Task
+          </button>
+      <Link to='/dashboard' className="header-link">
+        <div className="page-title">
+          <img src="LandingPageLogo.png"/>
+        </div>
+      </Link>
+          <button
+            onClick={() => {
+              navigate('/profile');
+            }}
+          >
+            Profile
+          </button>
+        </div>
+		  </nav>
+    </header>
   );
 };
   

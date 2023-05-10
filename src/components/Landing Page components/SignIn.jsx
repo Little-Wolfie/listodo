@@ -6,7 +6,7 @@ import { UserContext } from "../../contexts/UserContext";
 import { Form, Button, InputGroup, FormControl  } from "react-bootstrap";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 
-export const SignIn = () => {
+export const SignIn = ({setSignInPopup, setShowRegisterButton, setShowExistingUserButton, setShowOr}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -26,6 +26,14 @@ export const SignIn = () => {
       setError(error);
     }
   };
+
+  const handleLandingPageReturn = () => {
+    setSignInPopup(false)
+    setShowRegisterButton(true)
+    setShowExistingUserButton(true)
+    setShowOr(true)
+  }
+
   return (
     <Form>
       <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -57,7 +65,11 @@ export const SignIn = () => {
         />
         </InputGroup>
       </Form.Group>
+      <div className="button-container">
+      <Button onClick={handleLandingPageReturn}>Return</Button>
       <Button onClick={signIn}>Sign In</Button>
+
+      </div>
     </Form>
   );
 };
