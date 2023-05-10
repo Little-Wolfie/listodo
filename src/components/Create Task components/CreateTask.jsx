@@ -30,28 +30,42 @@ export const CreateTask = ({ map, setTasks }) => {
 
 	const handleCreateTaskSubmit = async (e) => {
 		e.preventDefault();
-		const dueDateTimeString = `${dueDate}T${dueTime}`;
-		const dueDateTime = new Date(dueDateTimeString);
-		const dueDateTimestamp = Timestamp.fromDate(dueDateTime);
+		// const dueDateTimeString = `${dueDate}T${dueTime}`;
+		// const dueDateTime = new Date(dueDateTimeString);
+		// const dueDateTimestamp = Timestamp.fromDate(dueDateTime);
+
+		// data shape
+		// {
+		//   id: 1,
+		//   type: 'Task',
+		//   score: 3,
+		//   name: 'Eat Pizza',
+		//   date: '2023-08-16',
+		//   time: '22:00',
+		//   location: { lng: -0.1, lat: 50 },
+		//   duration: 10,
+		//   description:
+		//     'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsum, accusantium error dolor atque numquam mollitia sint quae saepe illum deleniti. Asperiores, excepturi pariatur quibusdam vitae nesciunt quia. Aliquid, voluptatem! Dignissimos?',
+		// }
 		const task = {
+			// userId: auth.currentUser.uid,
 			id: uuidv4(),
-			deadline: dueDateTimestamp,
-			description: taskDescription,
-			duration: taskDuration,
+			type: type,
+			score: Number(taskUrgency) + Number(taskImportance),
 			name: taskTitle,
-			time: dueTime,
 			date: dueDate,
+			time: dueTime,
+			location: location,
+			duration: taskDuration,
+			description: taskDescription,
+			completed: false,
+			// deadline: dueDateTimestamp,
 			// need to deal with scoring
 			//score = (urgency_weight * urgency + importance_weight * importance) / (duration_weight * duration)
-			score: Number(taskUrgency) + Number(taskImportance),
-			type: type,
-			userId: auth.currentUser.uid,
-			completed: false
 		};
-		
-		
+
 		try {
-			const tasksCollectionRef = collection(db, currentUser)
+			const tasksCollectionRef = collection(db, currentUser);
 			// const userDocRef = doc(db, currentUser, `${task.name}`)
 			await setDoc(doc(tasksCollectionRef, task.name), task);
 			addTask(task);
@@ -59,13 +73,13 @@ export const CreateTask = ({ map, setTasks }) => {
 		} catch (error) {
 			console.error('Error adding task to Firestore:', error);
 		}
-		
+
 		setTasks(current => {
 			const newTasks = [task, ...current];
 			console.log('newTasks:', newTasks);
 			return newTasks;
 		});
-		
+
 		navigate('/dashboard');
 	};
 

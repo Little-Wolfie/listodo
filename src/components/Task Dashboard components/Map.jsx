@@ -113,6 +113,7 @@ const Map = ({
 			});
 
 			if (isSortedTask) {
+				console.log('isSortedTask:', isSortedTask);
 				m.togglePopup();
 			}
 
