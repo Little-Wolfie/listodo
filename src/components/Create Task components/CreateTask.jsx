@@ -4,9 +4,9 @@ import mapboxgl from 'mapbox-gl';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getFirestore, auth, db } from '../../firebase/firebase';
+import { auth, db } from '../../firebase/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, setDoc, collection, Timestamp } from 'firebase/firestore';
+import { doc, setDoc, collection } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 
 export const CreateTask = ({ map, setTasks }) => {

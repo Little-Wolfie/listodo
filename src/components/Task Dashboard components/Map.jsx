@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '../../css/TaskDashboard.css';
@@ -134,11 +134,13 @@ const Map = ({
 			});
 
 			const sortedTasks = tasks.slice().sort((a, b) => b.score - a.score);
+			if(tasks.length !== 0){
+				map.current.flyTo({
+					center: [sortedTasks[0].location.lng, sortedTasks[0].location.lat],
+					zoom: 14,
+				});
 
-			map.current.flyTo({
-				center: [sortedTasks[0].location.lng, sortedTasks[0].location.lat],
-				zoom: 14,
-			});
+			}
 
 			map.current.on('load', () => {
 				// do something on map load later

@@ -48,14 +48,6 @@ const CompletedTasks = ({setShowCompletedTaskButton, setRenderCompletedTask}) =>
     console.log(tasks)
   return (
     <div>
-      {/* <ul>
-        <li>{}</li>
-        <li>item2</li>
-        <li>item3</li>
-        <li>item4</li>
-        <li>item5</li>
-        <li>item6</li>
-      </ul> */}
       {tasks.length === 0 ? <p>No completed tasks</p> : tasks.map((task) => {
         return <ul>
             <li>{task.name}</li>
