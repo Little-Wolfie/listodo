@@ -3,7 +3,7 @@ import { auth } from "../../firebase/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
-import { Form, Button, InputGroup, FormControl  } from "react-bootstrap";
+import { Form, Button, InputGroup, FormControl, Alert } from "react-bootstrap";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 
 export const SignIn = () => {
@@ -14,6 +14,11 @@ export const SignIn = () => {
   const { user, setUser } = useContext(UserContext);
 
   const signIn = async () => {
+    if (!email || !password) {
+      setError("Please enter your email or password to sign in.");
+      return;
+    }
+
     try {
       await signInWithEmailAndPassword(auth, email, password).then(
         (userCredential) => {
@@ -46,18 +51,19 @@ export const SignIn = () => {
       <Form.Group className="mb-3" controlId="formBasicPassword">
         <Form.Label>Password</Form.Label>
         <InputGroup>
-        <InputGroup.Text>
-        <FaLock />
-        </InputGroup.Text>
-        <FormControl
-          placeholder="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <InputGroup.Text>
+            <FaLock />
+          </InputGroup.Text>
+          <FormControl
+            placeholder="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </InputGroup>
       </Form.Group>
       <Button onClick={signIn}>Sign In</Button>
+      {error && <Alert variant="danger">{error}</Alert>}
     </Form>
   );
 };
