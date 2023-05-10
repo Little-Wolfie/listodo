@@ -167,9 +167,7 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 
 	return (
 		<div className='task-dashboard'>
-			<NavigationButtons />
-
-			<button onClick={() => closeAllPopups()}>close</button>
+			
 
 			<FilterButtons
 				options={options}

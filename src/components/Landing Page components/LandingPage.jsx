@@ -25,11 +25,17 @@ export const LandingPage = () => {
   };
   return (
     <main className="flex-box">
-      <div className="landing-page-container p-3 rounded">
-        <div className="landing-page">
-          <div className="logo">Welcome to Map Your Day</div>
+      <div className="landing-page-container p-3">
+        
+          <img src="LandingPageLogo.png"/>
+          <div className="logo">Map Your Day</div>
 
-          {regPopup && <Register />}
+          {regPopup && <Register 
+            setRegPopup={setRegPopup}
+            setShowRegisterButton={setShowRegisterButton}
+            setShowExistingUserButton={setShowExistingUserButton}
+            setShowOr={setShowOr} 
+          />}
           {showExistingUserButton && (
             <Button
               variant="danger"
@@ -40,18 +46,21 @@ export const LandingPage = () => {
             </Button>
           )}
           
-          {signInPopup && <SignIn />}
+          {signInPopup && <SignIn 
+            setSignInPopup={setSignInPopup}
+            setShowRegisterButton={setShowRegisterButton}
+            setShowExistingUserButton={setShowExistingUserButton}
+            setShowOr={setShowOr} 
+          />}
           {showOr && 
             <div className="or-container d-flex align-items-center justify-content-center my-4">
-              <hr className="border-top border-2 border-secondary w-25 me-3" />
               <span className="or-text">OR</span>
-              <hr className="border-top border-2 border-secondary w-25 ms-3" />
             </div>
           }
 
           {showRegisterButton && (
             <Button
-              variant="success"
+              variant="danger"
               className="register-button mb-2"
               onClick={regClickHandler}
             >
@@ -59,7 +68,7 @@ export const LandingPage = () => {
             </Button>
           )}
           
-        </div>
+        
       </div>
     </main>
   );

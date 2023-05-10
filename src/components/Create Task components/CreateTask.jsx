@@ -118,9 +118,9 @@ export const CreateTask = ({ map, setTasks }) => {
 
 	return (
 		<div className='create-task'>
-			<h2>Create Task</h2>
-			<div className='body'>
-				<form onSubmit={handleCreateTaskSubmit}>
+			<h2 className="create-task-title">Create Task</h2>
+			
+				<form className="create-task-container" onSubmit={handleCreateTaskSubmit}>
 					<label htmlFor='input-type'>Task type</label>
 					<select
 						id='input-type'
@@ -212,7 +212,7 @@ export const CreateTask = ({ map, setTasks }) => {
 
 					<button type='submit'>Create</button>
 				</form>
-			</div>
+		
 		</div>
 	);
 }

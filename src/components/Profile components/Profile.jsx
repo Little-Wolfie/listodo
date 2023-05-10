@@ -113,7 +113,7 @@ export const Profile = () => {
       <header>
         <img
           className="profile-picture rounded-circle img-thumbnail"
-          src={profilePicture ? profilePicture : "../../public/userIcon.png"}
+          src={profilePicture ? profilePicture : "userIcon.png"}
           alt="profile-picture"
         />
       </header>
