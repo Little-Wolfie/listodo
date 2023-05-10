@@ -38,8 +38,9 @@ export const CreateTask = ({ map, setTasks }) => {
 			deadline: dueDateTimestamp,
 			description: taskDescription,
 			duration: taskDuration,
-			location: location,
 			name: taskTitle,
+			time: dueTime,
+			date: dueDate,
 			// need to deal with scoring
 			//score = (urgency_weight * urgency + importance_weight * importance) / (duration_weight * duration)
 			score: Number(taskUrgency) + Number(taskImportance),

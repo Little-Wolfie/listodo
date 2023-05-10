@@ -82,9 +82,8 @@ const Map = ({ center, tasks, map, setActiveKey, setMarkers }) => {
         `
           <div class="popup-content">
             <h6><strong>${task.name}</strong></h6>
-            <p>${task.type}</p>
-            <p>${task.location.name}</p>
-            <p>${task.deadline}</p>
+            <p>${task.name}</p>
+            <p>${task.date}</p>
           </div>
         `
       );
