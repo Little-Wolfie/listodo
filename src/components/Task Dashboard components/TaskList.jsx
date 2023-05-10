@@ -1,4 +1,7 @@
 import Accordion from 'react-bootstrap/Accordion';
+import { doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { db } from  "../../firebase/firebase"
+import SwipeableAccordionItem from './SwipeableAccordionItem';
 
 const TaskList = ({
 	activeKey,
@@ -11,22 +14,44 @@ const TaskList = ({
 	setEditableIndex,
 	flyToTask,
 	closeAllPopups,
+	currentUser,
+	setTasks
 }) => {
+	const handleTaskDelete = async (taskId, taskName) => {
+		console.log(taskName)
+		setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+		try {
+			const taskRef = doc(db, currentUser, taskName.toString());
+			await deleteDoc(taskRef);
+		} catch (error) {
+			console.error('Error deleteing task:', error);
+		}
+	};
+
+	const handleCompletedTask = async task => {
+		const taskRef = doc(db, currentUser, task.name);
+		await updateDoc(taskRef, {
+			completed: true,
+		});
+	};
+
 	return (
 		<div className='list-container'>
+
 			<Accordion
 				activeKey={activeKey}
 				onSelect={selectedKey => {
 					closeAllPopups();
 					setActiveKey(prevKey =>
 						prevKey === selectedKey ? null : selectedKey
-					);
-				}}
-			>
+						);
+					}}
+					>
 				{tasks.map((task, i) => {
 					return (
+						<SwipeableAccordionItem taskId={task.id} taskName={task.name} handleTaskDelete={handleTaskDelete} key={i}>
 						<Accordion.Item
-							eventKey={task.id.toString()}
+						eventKey={task.id.toString()}
 							key={i}
 							id={`accordion-item-${task.id}`}
 						>
@@ -49,7 +74,7 @@ const TaskList = ({
 									onChange={e =>
 										handleTimeDateChange(i, e.target.value, 'time')
 									}
-								/>
+									/>
 								<input
 									type='date'
 									value={task.date}
@@ -59,23 +84,24 @@ const TaskList = ({
 								/>
 								{editableIndex === i ? (
 									<textarea
-										style={{ height: '180px', width: '300px' }}
+									style={{ height: '180px', width: '300px' }}
 										type='text'
 										defaultValue={task.description}
 										onChange={e => setEditText(e.target.value)}
 									/>
-								) : (
-									task.description
-								)}
+									) : (
+										task.description
+										)}
 								{editableIndex === i ? (
 									<button onClick={() => handleSaveClick(i)}>Save</button>
 								) : (
 									<button onClick={() => setEditableIndex(i)}>Edit</button>
 								)}
 								<button onClick={() => flyToTask(task)}>Show On Map</button>
-								<button>Completed</button>
+								<button onClick={() => handleCompletedTask(task)}>Completed</button>
 							</Accordion.Body>
 						</Accordion.Item>
+					</SwipeableAccordionItem>
 					);
 				})}
 			</Accordion>

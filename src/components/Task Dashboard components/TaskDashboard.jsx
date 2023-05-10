@@ -1,19 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import '../../css/TaskDashboard.css';
 import FilterButtons from './FilterButtons';
 import MapElement from './MapElement';
 import TaskList from './TaskList';
 import NavigationButtons from './NavigationButtons';
-import { useNavigate } from "react-router-dom";
 import "../../css/TaskDashboard.css";
-import Map from "./Map";
 import "react-datepicker/dist/react-datepicker.css";
-// import { doc, setDoc, getDoc, query, where, collection, Timestamp, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
-// import { db, auth } from  "../../firebase/firebase"
-// import { onAuthStateChanged } from "firebase/auth";
-// import { useSwipeable } from 'react-swipeable';
-// import SwipeableAccordionItem from './SwipeableAccordionItem';
+import { query, where, collection, getDocs} from "firebase/firestore";
+import { db, auth } from  "../../firebase/firebase"
+import { onAuthStateChanged } from "firebase/auth";
+
 
 const MAP_REFRESH = {
 	min: 0.0001,
@@ -37,7 +34,7 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 	const [currentOptionIndex, setCurrentOptionIndex] = useState(0);
 	const [currentOrder, setCurrentOrder] = useState(false);
 	const [timestamp, setTimestamp] = useState(null);
-	// const [currentUser, setCurrentUser] = useState('');
+	const [currentUser, setCurrentUser] = useState('');
 
 	const handleSaveClick = i => {
 		setTaskUtil(i, 'description', editText);
@@ -89,16 +86,16 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 	};
 
 	const flyToTask = task => {
-		setCenter({
-			lng: (
-				task.location.lng +
-				(Math.random() * (MAP_REFRESH.max - MAP_REFRESH.min) + MAP_REFRESH.min)
-			).toFixed(4),
-			lat: (
-				task.location.lat +
-				(Math.random() * (MAP_REFRESH.max - MAP_REFRESH.min) + MAP_REFRESH.min)
-			).toFixed(4),
-		});
+			setCenter({
+				lng: (
+					task.location.lng +
+					(Math.random() * (MAP_REFRESH.max - MAP_REFRESH.min) + MAP_REFRESH.min)
+				).toFixed(4),
+				lat: (
+					task.location.lat +
+					(Math.random() * (MAP_REFRESH.max - MAP_REFRESH.min) + MAP_REFRESH.min)
+				).toFixed(4),
+			});
 	};
 
 	const closeAllPopups = () => {
@@ -110,44 +107,34 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 		});
 	};
 
-	// const handleCompletedTask = async task => {
-	// 	const taskRef = doc(db, currentUser, task.name);
-	// 	await updateDoc(taskRef, {
-	// 		completed: true,
-	// 	});
-	// };
+	
 
-	// const handleTaskDelete = async taskId => {
-	// 	setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
-	// 	try {
-	// 		const taskRef = doc(db, currentUser, taskId.toString());
-	// 		await deleteDoc(taskRef);
-	// 	} catch (error) {
-	// 		console.error('Error deleteing task:', error);
-	// 	}
-	// };
+	
 
-	// const fetchTasksFromDB = async () => {
-	// 	try {
-	// 		const retrievedDocuments = await getDocs(collection(db, currentUser));
-	// 		const fetchedTasks = retrievedDocuments.docs.map(doc => ({
-	// 			id: doc.id,
-	// 			...doc.data(),
-	// 		}));
-	// 		setTasks(fetchedTasks);
-	// 		console.log('fetchedTasks:', fetchedTasks);
-	// 	} catch (error) {
-	// 		console.error('Error fetching tasks from database:', error);
-	// 	}
-	// };
+	const fetchTasksFromDB = async () => {
+		try {
+			const collectionQuery = await query(collection(db, currentUser), where("completed", "==", false));
+			const retrievedTasks = await getDocs(collectionQuery)
+			const fetchedTasks = retrievedTasks.docs.map(doc => ({
+				id: doc.id,
+				...doc.data(),
+			}));
+			setTasks(fetchedTasks);
+		} catch (error) {
+			console.error('Error fetching tasks from database:', error);
+		}
+	};
 
 	useEffect(() => {
-		setTasks(() => {
-			const sorted = sortTasks(options[currentOptionIndex].value);
-			setActiveKey(sorted[0].id.toString());
-			setTimestamp(Date.now());
-			return sorted;
-		});
+		if(tasks.length !== 0){
+
+			setTasks(() => {
+				const sorted = sortTasks(options[currentOptionIndex].value);
+				setActiveKey(sorted[0].id.toString());
+				setTimestamp(Date.now());
+				return sorted;
+			});
+		}
 	}, [currentOptionIndex]);
 
 	useEffect(() => {
@@ -164,19 +151,19 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 		}
 	}, [activeKey, timestamp]);
 
-	// useEffect(() => {
-	// 	const getUserDetails = () => {
-	// 		onAuthStateChanged(auth, userAuth => {
-	// 			if (userAuth) {
-	// 				setCurrentUser(userAuth.uid);
-	// 			}
-	// 		});
-	// 	};
-	// 	getUserDetails();
-	// 	if (currentUser !== '') {
-	// 		fetchTasksFromDB();
-	// 	}
-	// }, [currentUser]);
+	useEffect(() => {
+		const getUserDetails = () => {
+			onAuthStateChanged(auth, userAuth => {
+				if (userAuth) {
+					setCurrentUser(userAuth.uid);
+				}
+			});
+		};
+		getUserDetails();
+		if (currentUser !== '') {
+			fetchTasksFromDB();
+		}
+	}, [currentUser]);
 
 	return (
 		<div className='task-dashboard'>
@@ -208,6 +195,8 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 				setEditableIndex={setEditableIndex}
 				flyToTask={flyToTask}
 				closeAllPopups={closeAllPopups}
+				currentUser={currentUser}
+				setTasks={setTasks}
 			/>
 
 			<MapElement
