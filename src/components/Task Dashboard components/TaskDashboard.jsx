@@ -5,6 +5,12 @@ import { useNavigate } from "react-router-dom";
 import "../../css/TaskDashboard.css";
 import Map from "./Map";
 import "react-datepicker/dist/react-datepicker.css";
+import { doc, setDoc, getDoc, query, where, collection, Timestamp, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
+import { db, auth } from  "../../firebase/firebase"
+import { onAuthStateChanged } from "firebase/auth";
+import { useSwipeable } from 'react-swipeable';
+import SwipeableAccordionItem from './SwipeableAccordionItem';
+
 
 const MAP_REFRESH = {
   min: 0.0000001,
@@ -24,10 +30,11 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 	const [editableIndex, setEditableIndex] = useState(null);
 	const [editText, setEditText] = useState('');
 	const [center, setCenter] = useState({ lng: -0.4, lat: 51 });
-  const [activeKey, setActiveKey] = useState(null);
+  	const [activeKey, setActiveKey] = useState(null);
 	const [markers, setMarkers] = useState([]);
-  const [currentOptionIndex, setCurrentOptionIndex] = useState(0);
-  const [currentOrder, setCurrentOrder] = useState(false)
+  	const [currentOptionIndex, setCurrentOptionIndex] = useState(0);
+  	const [currentOrder, setCurrentOrder] = useState(false)
+	const [currentUser, setCurrentUser] = useState("")
 
 	const handleSaveClick = i => {
 		setTaskUtil(i, 'description', editText);
@@ -46,6 +53,19 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
         return task;
       })
 		);
+  }
+
+  const fetchTasksFromDB = async () => {
+    try {
+	const retrievedDocuments = await getDocs(collection(db, currentUser))
+    const fetchedTasks = retrievedDocuments.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      setTasks(fetchedTasks)
+    } catch (error) {
+      console.error("Error fetching tasks from database:", error)
+    }
   }
 
   const handleButtonClick = () => {
@@ -73,6 +93,7 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
     });
   }
 
+
   const orderTasks = () => {
     setCurrentOrder(current => !current);
     setTasks(current => {
@@ -85,6 +106,14 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
     })
   }
 
+  const handleCompletedTask = async (task) => {
+
+	const taskRef = doc(db, currentUser, task.name)
+	await updateDoc(taskRef, {
+		completed: true
+	})
+  }
+
   const flyToTask = (task) => {
     setCenter(
       { 
@@ -93,9 +122,35 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
       })
   }
 
+  const handleTaskDelete = async (taskId) => {
+	setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId))
+	try {
+		const taskRef = doc(db, currentUser, taskId.toString())
+		await deleteDoc(taskRef)
+	} catch (error) {
+		console.error("Error deleteing task:", error)
+	}
+  }
+
+  
+
   useEffect(() => {
     sortTasks(options[currentOptionIndex].value);
   }, [currentOptionIndex])
+
+  useEffect(() => {
+	const getUserDetails = () => {
+		onAuthStateChanged(auth, (userAuth) => {
+		  if (userAuth) {
+			setCurrentUser(userAuth.uid)
+		  }
+		});
+	  };
+	getUserDetails()
+	if(currentUser !== ""){
+		fetchTasksFromDB();
+	}
+  }, [currentUser])
 
   useEffect(() => {
     const selectedTask = tasks.filter(task => task.id === Number(activeKey));
@@ -165,12 +220,14 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
         onSelect={(selectedKey) => setActiveKey((prevKey) => prevKey === selectedKey ? null : selectedKey)}>
 
 					{tasks.map((task, i) => {
+
 						return (
+							<SwipeableAccordionItem taskId={task.id} handleTaskDelete={handleTaskDelete} key={i}>
 							<Accordion.Item
 								eventKey={task.id.toString()}
 								key={i}
-                id={`accordion-item-${task.id}`}
-							>
+								id={`accordion-item-${task.id}`}
+								>
 								<Accordion.Header>
 									<div className='card-left'>
 										<h2>{task.score}</h2>
@@ -188,33 +245,34 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 										type='time'
 										value={task.time}
 										onChange={e => handleTimeDateChange(i, e.target.value, 'time')}
-									/>
+										/>
 									<input
 										type='date'
 										value={task.date}
 										onChange={e => handleTimeDateChange(i, e.target.value, 'date')}
-									/>
+										/>
 									{editableIndex === i ? (
 										<textarea
-											style={{ height: '180px', width: '300px' }}
-											type='text'
-											defaultValue={task.description}
-											onChange={(e) => setEditText(e.target.value)}
+										style={{ height: '180px', width: '300px' }}
+										type='text'
+										defaultValue={task.description}
+										onChange={(e) => setEditText(e.target.value)}
 										/>
-									) : (
-										task.description
-									)}
+										) : (
+											task.description
+											)}
 									{editableIndex === i ? (
 										<button onClick={() => handleSaveClick(i)}>Save</button>
-									) : (
-										<button onClick={() => setEditableIndex(i)}>Edit</button>
-									)}
+										) : (
+											<button onClick={() => setEditableIndex(i)}>Edit</button>
+											)}
 									<button onClick={() => flyToTask(task)}>
 										Show On Map
 									</button>
-									<button>Completed</button>
+									<button onClick={() => handleCompletedTask(task)}>Completed</button>
 								</Accordion.Body>
 							</Accordion.Item>
+							</SwipeableAccordionItem>
 						);
 					})}
 				</Accordion>
