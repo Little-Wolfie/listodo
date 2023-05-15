@@ -30,25 +30,7 @@ export const CreateTask = ({ map, setTasks }) => {
 
 	const handleCreateTaskSubmit = async (e) => {
 		e.preventDefault();
-		// const dueDateTimeString = `${dueDate}T${dueTime}`;
-		// const dueDateTime = new Date(dueDateTimeString);
-		// const dueDateTimestamp = Timestamp.fromDate(dueDateTime);
-
-		// data shape
-		// {
-		//   id: 1,
-		//   type: 'Task',
-		//   score: 3,
-		//   name: 'Eat Pizza',
-		//   date: '2023-08-16',
-		//   time: '22:00',
-		//   location: { lng: -0.1, lat: 50 },
-		//   duration: 10,
-		//   description:
-		//     'Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsum, accusantium error dolor atque numquam mollitia sint quae saepe illum deleniti. Asperiores, excepturi pariatur quibusdam vitae nesciunt quia. Aliquid, voluptatem! Dignissimos?',
-		// }
 		const task = {
-			// userId: auth.currentUser.uid,
 			id: uuidv4(),
 			type: type,
 			score: Number(taskUrgency) + Number(taskImportance),
@@ -59,14 +41,10 @@ export const CreateTask = ({ map, setTasks }) => {
 			duration: taskDuration,
 			description: taskDescription,
 			completed: false,
-			// deadline: dueDateTimestamp,
-			// need to deal with scoring
-			//score = (urgency_weight * urgency + importance_weight * importance) / (duration_weight * duration)
 		};
 
 		try {
 			const tasksCollectionRef = collection(db, currentUser);
-			// const userDocRef = doc(db, currentUser, `${task.name}`)
 			await setDoc(doc(tasksCollectionRef, task.name), task);
 			addTask(task);
 			navigate('/dashboard');
@@ -76,7 +54,6 @@ export const CreateTask = ({ map, setTasks }) => {
 
 		setTasks(current => {
 			const newTasks = [task, ...current];
-			console.log('newTasks:', newTasks);
 			return newTasks;
 		});
 
@@ -104,7 +81,6 @@ export const CreateTask = ({ map, setTasks }) => {
 			});
 
 			geocoder.on('result', e => {
-				console.log(e.result);
 				setLocation({
 					name: e.result.text,
 					lng: e.result.center[0],
@@ -118,8 +94,7 @@ export const CreateTask = ({ map, setTasks }) => {
 
 	return (
 		<div className='create-task'>
-			<h2 className="create-task-title">Create Task</h2>
-			
+			<h2 className="create-task-title">Create Task</h2>		
 				<form className="create-task-container" onSubmit={handleCreateTaskSubmit}>
 					<label htmlFor='input-type'>Task type</label>
 					<select
@@ -211,8 +186,7 @@ export const CreateTask = ({ map, setTasks }) => {
 					</article>
 
 					<button type='submit'>Create</button>
-				</form>
-		
+				</form>		
 		</div>
 	);
 }

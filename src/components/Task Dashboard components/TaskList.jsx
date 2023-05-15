@@ -18,7 +18,6 @@ const TaskList = ({
 	setTasks
 }) => {
 	const handleTaskDelete = async (taskId, taskName) => {
-		console.log(taskName)
 		setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
 		try {
 			const taskRef = doc(db, currentUser, taskName.toString());
