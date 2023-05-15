@@ -13,11 +13,9 @@ const FilterButtons = ({
 					{options[currentOptionIndex].label}
 				</button>
 			</div>
-
 			<div>
 				<button onClick={orderTasks}>{currentOrder ? 'Asc' : 'Desc'}</button>
 			</div>
-
 			<button
 				onClick={() => {
 					setCurrentOptionIndex(0);

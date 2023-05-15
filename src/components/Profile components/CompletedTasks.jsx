@@ -7,7 +7,7 @@ const CompletedTasks = ({setShowCompletedTaskButton, setRenderCompletedTask}) =>
 
   const [currentUser, setCurrentUser] = useState("")
   const [tasks, setTasks] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const fetchTasksFromDB = async () => {
     try {
@@ -24,7 +24,6 @@ const CompletedTasks = ({setShowCompletedTaskButton, setRenderCompletedTask}) =>
   }
 
   useEffect(() => {
-    setIsLoading(true)
     const getUserDetails = () => {
         onAuthStateChanged(auth, (userAuth) => {
           if (userAuth) {
@@ -45,7 +44,7 @@ const CompletedTasks = ({setShowCompletedTaskButton, setRenderCompletedTask}) =>
     }
 
   if(isLoading) return <p>Tasks loading...</p>
-    console.log(tasks)
+
   return (
     <div>
       {tasks.length === 0 ? <p>No completed tasks</p> : tasks.map((task) => {

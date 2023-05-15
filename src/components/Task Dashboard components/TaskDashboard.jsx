@@ -4,7 +4,6 @@ import '../../css/TaskDashboard.css';
 import FilterButtons from './FilterButtons';
 import MapElement from './MapElement';
 import TaskList from './TaskList';
-import NavigationButtons from './NavigationButtons';
 import "../../css/TaskDashboard.css";
 import "react-datepicker/dist/react-datepicker.css";
 import { query, where, collection, getDocs} from "firebase/firestore";
@@ -153,6 +152,7 @@ export const TaskDashboard = ({ map, tasks = [], setTasks }) => {
 
 	useEffect(() => {
 		const getUserDetails = () => {
+			console.log(auth.currentUser.email)
 			onAuthStateChanged(auth, userAuth => {
 				if (userAuth) {
 					setCurrentUser(userAuth.uid);

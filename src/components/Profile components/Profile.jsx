@@ -20,7 +20,6 @@ export const Profile = () => {
     useState(false);
   const [showChangePasswordButton, setShowChangePasswordButton] =
     useState(true);
-
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -30,7 +29,6 @@ export const Profile = () => {
   const [showChangeImageForm, setShowChangeImageForm] = useState(false);
   const [showCompletedTaskButton, setShowCompletedTaskButton] = useState(true);
   const [renderCompletedTask, setRenderCompletedTask] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [profilePicture, setProfilePicture] = useState("");
@@ -106,8 +104,6 @@ export const Profile = () => {
       });
   };
 
-  if (isLoading) return <p>Loading...</p>;
-
   return (
     <div className="profile">
       <header>
@@ -181,7 +177,7 @@ export const Profile = () => {
             </InputGroup>
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicEmail">
-              <InputGroup>
+            <InputGroup>
             <InputGroup.Text>
                   <FaLock />
                 </InputGroup.Text>

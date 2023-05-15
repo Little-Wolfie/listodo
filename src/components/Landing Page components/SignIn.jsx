@@ -2,28 +2,24 @@ import { useState, useContext } from "react";
 import { auth } from "../../firebase/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../../contexts/UserContext";
 import { Form, Button, InputGroup, FormControl  } from "react-bootstrap";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 
 export const SignIn = ({setSignInPopup, setShowRegisterButton, setShowExistingUserButton, setShowOr}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(false);
   const navigate = useNavigate();
-  const { user, setUser } = useContext(UserContext);
 
   const signIn = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password).then(
-        (userCredential) => {
-          setUser(userCredential.user);
+        () => {
           navigate("/dashboard");
         }
       );
-    } catch (error) {
-      console.error(error);
-      setError(error);
+    } catch {
+      setError(true);
     }
   };
 
@@ -65,6 +61,7 @@ export const SignIn = ({setSignInPopup, setShowRegisterButton, setShowExistingUs
         />
         </InputGroup>
       </Form.Group>
+      {error && <p>Email or Password invalid</p>}
       <div className="button-container">
       <Button onClick={handleLandingPageReturn}>Return</Button>
       <Button onClick={signIn}>Sign In</Button>

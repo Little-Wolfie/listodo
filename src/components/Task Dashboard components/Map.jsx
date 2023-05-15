@@ -19,9 +19,7 @@ const Map = ({
 	tasks,
 	map,
 	setActiveKey,
-	markers,
 	setMarkers,
-	sortTasks,
 	closeAllPopups,
 }) => {
 	const mapContainerRef = useRef(null);
@@ -141,10 +139,6 @@ const Map = ({
 				});
 
 			}
-
-			map.current.on('load', () => {
-				// do something on map load later
-			});
 
 			const newMarkers = createMarkers();
 			setMarkers(newMarkers);
